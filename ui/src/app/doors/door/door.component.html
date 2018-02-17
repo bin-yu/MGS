@@ -1,0 +1,42 @@
+<h2>
+    {{isAdd?"添加新门禁":"修改已有门禁：" + door.sn}}</h2>
+  <form name="workerForm">
+    <div class="form-group row">
+      <label for="protocol" class="col-lg-2 col-form-label">通信协议</label>
+      <div class="col-lg-10">
+        <select class="form-control" id="protocol" name="protocol" [(ngModel)]="door.protocol">
+            <option value='TCP'>TCP</option>
+            <option value='MOCK'>MOCK</option>
+          </select>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="sn" class="col-lg-2 col-form-label">序列号</label>
+      <div class="col-lg-10">
+        <input type="text" class="form-control" id="sn" name="sn" placeholder="输入序列号" [(ngModel)]="door.sn">
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="password" class="col-lg-2 col-form-label">通讯密码</label>
+      <div class="col-lg-10">
+        <input type="text" class="form-control" id="password" name="password" placeholder="输入通讯密码" [(ngModel)]="door.password">
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="ip" class="col-lg-2 col-form-label">IP地址</label>
+      <div class="col-lg-10">
+        <input type="text" class="form-control " id="ip" name="ip" placeholder="输入IP地址" [(ngModel)]="door.ip">
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="port" class="col-lg-2 col-form-label">端口号</label>
+      <div class="col-lg-10">
+        <input type="text" class="form-control" id="port" name="port" placeholder="输入端口号" [(ngModel)]="door.port">
+      </div>
+    </div>
+    <div class="container-fluid">
+        <button type="button" class=" btn btn-primary btn-lg submit-btn" (click)="onSubmit()">提交</button>
+        <button type="button" class=" btn btn-primary btn-lg submit-btn" routerLink="../">取消</button>
+    </div>
+  </form>
+

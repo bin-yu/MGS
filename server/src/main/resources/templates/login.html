@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="">
+<meta name="author" content="">
+<title>成都地铁民工信息管理系统</title>
+<!-- Bootstrap core CSS-->
+<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+<!-- Custom styles for this template-->
+<link th:href="@{/css/sb-admin.css}" rel="stylesheet">
+</head>
+<body class="bg-dark">
+	<div class="container">
+		<div class="card card-login mx-auto mt-5">
+			<div class="card-header">请登录</div>
+			<div th:if="${param.error}" th:text="${session.SPRING_SECURITY_LAST_EXCEPTION.message}" class="alert alert-danger"></div>
+			<div class="card-body">
+				<form name='f' th:action="@{/login}" method='post'>
+					<div class="form-group">
+						<label for="login_username">用户名:</label> <input
+							class="form-control" type="text" id="login_username"
+							name="username" placeholder="用户名" required="required">
+					</div>
+					<div class="form-group">
+						<label for="login_password">密码:</label> <input
+							class="form-control" type="password" id="login_password"
+							name="password" placeholder="密码" required="required">
+					</div>
+					<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+					<!-- <div class="form-group">
+            <div class="form-check">
+              <label class="form-check-label">
+                <input class="form-check-input" type="checkbox"> Remember Password</label>
+            </div>
+          </div> -->
+					<button class="btn btn-primary btn-block" id="btn_login" type="submit">登录</button>
+				</form>
+				<!-- <div class="text-center">
+          <a class="d-block small mt-3" href="register.html">Register an Account</a>
+          <a class="d-block small" href="forgot-password.html">Forgot Password?</a>
+        </div> -->
+			</div>
+		</div>
+	</div>
+
+</body>
+</html>

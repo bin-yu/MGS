@@ -1,0 +1,32 @@
+<div class="form-group row ">
+  <div class="col-sm-6 col-md-6 col-lg-6">
+    <button class="btn btn-primary" type="button" routerLink="./new">添加</button>
+    <button class="btn btn-primary" type="button" (click)="performDelete()">删除</button>
+  </div>
+  <div class="col-sm-6 col-md-6 col-lg-6">
+      <input type="text" class="form-control" placeholder="查找...">
+  </div>
+</div>
+<table class="table table-bordered table-hover">
+  <thead>
+    <tr>
+      <th scope="col"></th>
+      <th scope="col">卡号</th>
+      <th scope="col">员工编号</th>
+      <th scope="col">员工姓名</th>
+      <th scope="col">是否在黑名单</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let card of cards">
+      <th scope="row">
+        <input type="checkbox" (change)="handleSelectEvent($event,card)" />
+      </th>
+      <td>{{card.cardNo}}</td>
+      <td>{{card.worker.id}}</td>
+      <td>{{card.worker.name}}</td>
+      <td>{{card.inBlackList?'是':'否'}}</td>
+    </tr>
+  </tbody>
+</table>
+<app-pagination [totalItems] = "totalItems" [pageSize]="pageable.size" (onPageLoad)="loadPage($event)"></app-pagination>

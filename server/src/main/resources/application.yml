@@ -1,0 +1,21 @@
+server:
+  display-name: MGS System
+spring:
+  application:
+    name: MGS
+spring.datasource:
+  url: jdbc:hsqldb:file:db/mgs
+  username: SA
+spring.jpa.hibernate.ddl-auto: update
+spring.jpa.show-sql: true
+spring.mvc.throw-exception-if-no-handler-found: true
+spring.resources.add-mappings: false
+mgs:
+  policy:
+    executor:
+      interval-hours: 1
+security.basic.enabled: false
+
+---
+spring:
+  profiles: test

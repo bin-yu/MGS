@@ -1,0 +1,28 @@
+<div class="input-group ">
+  <button class="btn btn-primary" type="button" routerLink="./new" >添加</button>
+  <button class="btn btn-primary" type="button" (click)="performDelete()">删除</button>
+  <input type="text" class="form-control" placeholder="查找...">
+</div>
+<table class="table table-bordered table-hover">
+  <thead>
+    <tr>
+      <th scope="col"></th>
+      <th scope="col">编号</th>
+      <th scope="col">登录名</th>
+      <th scope="col">姓名</th>
+      <th scope="col">角色</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let user of users">
+      <th scope="row">
+        <input type="checkbox" (change)="handleSelectEvent($event,user)"/>
+      </th>
+      <td>{{user.id}}</td>
+      <td><a href="#" routerLink="./{{user.id}}">{{user.name}}</a></td>
+      <td>{{user.displayName }}</td>
+      <td>{{user.getRoleStr()}}</td>
+    </tr>
+  </tbody>
+</table>
+<app-pagination [totalItems] = "totalItems" [pageSize]="pageable.size" (onPageLoad)="loadPage($event)"></app-pagination>

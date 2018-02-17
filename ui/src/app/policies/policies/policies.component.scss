@@ -1,0 +1,14 @@
+.input-group {
+    position: relative;
+    width: 100%;
+}
+.input-group .form-control {
+    position: relative;
+    z-index: 2;
+    float: right;
+    width: 40%;
+    margin-bottom: 0;
+}
+.btn{
+    margin-right: 5px;
+}

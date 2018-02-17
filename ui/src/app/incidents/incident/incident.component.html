@@ -1,0 +1,76 @@
+<h2>
+  {{isAdd?"新建事件":"修改事件：" + incident.id}}</h2>
+<form name="incidentForm">
+  <div class="form-group row">
+    <label for="category" class="col-lg-2 col-form-label">类型</label>
+    <div class="col-lg-3 col-md-3 col-sm-6">
+      <select class="form-control" id="category" name="category" [(ngModel)]="incident.category">
+        <option value='BLACK'>违规事件</option>
+        <option value='RED'>表扬事件</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="severity" class="col-lg-2 col-form-label">级别</label>
+    <div class="col-lg-10">
+      <div class="slidecontainer">
+        <input type="range" min="1" max="10" value="5" class="slider" id="severity" name="severity" [(ngModel)]="incident.severity">
+      </div>
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="happenTime" class="col-lg-2 col-form-label">发生时间</label>
+    <!-- <div class="col-lg-4">
+    <input type="date" class="form-control" id="happenTime" name="happenTime" placeholder="输入发生时间" max="{{maxDate | date: 'yyyy-MM-dd'}}" [(ngModel)]="incident.happenTime">
+    </div>
+    <div class="col-lg-6"></div> -->
+    
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <div class="input-group">
+          <input class="form-control" placeholder="yyyy-mm-dd"
+                 name="dp" [(ngModel)]="incident.happenTime" [maxDate]="maxDate" ngbDatepicker #d="ngbDatepicker">
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary calendar-img-outer" (click)="d.toggle()" type="button">
+              <img class="calendar-img" src="assets/img/calendar-icon.png" />
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- <input matInput class="form-control" [max]="maxDate" [matDatepicker]="picker" id="happenTime" name="happenTime" placeholder="输入发生时间"
+        [(ngModel)]="incident.happenTime">
+
+    </div>
+    <div class="col-lg-1">
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker> -->
+    
+  </div>
+  <div class="form-group row">
+    <label for="location" class="col-lg-2 col-form-label">发生地点</label>
+    <div class="col-lg-10">
+      <input type="text" class="form-control " id="location" name="location" placeholder="输入发生地点" [(ngModel)]="incident.location">
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="subject" class="col-lg-2 col-form-label">民工编号</label>
+    <div class="col-lg-10">
+      <input type="text" class="form-control" id="subject" name="subject" placeholder="输入民工编号" [(ngModel)]="incident.subject.id">
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="title" class="col-lg-2 col-form-label">事件概要</label>
+    <div class="col-lg-10">
+      <input type="text" class="form-control" id="title" name="title" placeholder="输入事件概要" [(ngModel)]="incident.title">
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="description" class="col-lg-2 col-form-label">详细描述</label>
+    <div class="col-lg-10">
+      <textarea id="description" rows="6" class="form-control" name="description" placeholder="输入详细描述" [(ngModel)]="incident.description"></textarea>
+    </div>
+  </div>
+  <div class="container-fluid">
+      <button type="button" class=" btn btn-primary btn-lg submit-btn" (click)="onSubmit()">提交</button>
+      <button type="button" class=" btn btn-primary btn-lg submit-btn" routerLink="../">取消</button>
+  </div>
+</form>

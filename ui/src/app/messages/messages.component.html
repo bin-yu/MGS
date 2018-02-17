@@ -1,0 +1,7 @@
+<div *ngIf="messageService.messages.size" class="app-msg-pane">
+    <div *ngFor='let message of messageService.messages' class="alert alert-{{message.type}} alert-dismissible">
+      <a class="close" data-dismiss="alert" aria-label="close" (click)="messageService.remove(message)" >&times;</a>
+      {{message.content}}
+    </div>
+</div>
+  

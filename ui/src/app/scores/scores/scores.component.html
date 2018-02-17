@@ -1,0 +1,30 @@
+<div class="input-group ">
+    <input type="text" class="form-control" placeholder="查找...">
+  </div>
+  <table class="table table-bordered table-hover">
+    <thead>
+      <tr>
+        <th scope="col">姓名</th>
+        <th scope="col">员工编号</th>
+        <th scope="col">证件号码</th>
+        <th scope="col">劳务公司</th>
+        <th scope="col">累计积分</th>
+        <th scope="col">违规次数</th>
+        <th scope="col">表彰次数</th>
+        <th scope="col">是否进黑名单</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let worker of workers">
+        <td>{{worker.name}}</td>
+        <td>{{worker.id}}</td>
+        <td>{{worker.idNo}}</td>
+        <td>{{worker.employer}}</td>
+        <td>{{worker.score}}</td>
+        <td>{{worker.incidentCnts.BLACK}}</td>
+        <td>{{worker.incidentCnts.RED}}</td>
+        <td>{{worker.inBlackList?'是':'否'}}</td>
+      </tr>
+    </tbody>
+  </table>
+  <app-pagination [totalItems] = "totalItems" [pageSize]="pageable.size" (onPageLoad)="loadPage($event)"></app-pagination>

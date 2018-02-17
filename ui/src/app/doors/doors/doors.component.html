@@ -1,0 +1,37 @@
+<div class="input-group ">
+    <button class="btn btn-primary" type="button" routerLink="/doors/new" >添加</button>
+    <button class="btn btn-primary" type="button" (click)="performDelete()">删除</button>
+    <button class="btn btn-primary" type="button" (click)="performTest()">测试连接</button>
+    <button class="btn btn-primary" type="button" (click)="checkCardAreaStatus()">查看卡区域状态</button>
+    <button class="btn btn-primary" type="button" (click)="readCardData()">查看卡</button>
+    <button class="btn btn-primary" type="button" (click)="deleteCard()">删除卡</button>
+    <button class="btn btn-primary" type="button" (click)="addCardToBlacklist()">添加黑名单</button>
+  </div>
+  <table class="table table-bordered table-hover">
+    <thead>
+      <tr>
+        <th scope="col"></th>
+        <th scope="col">编号</th>
+        <th scope="col">协议类型</th>
+        <th scope="col">序列号</th>
+        <th scope="col">IP地址</th>
+        <th scope="col">端口号</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let door of doors">
+        <th scope="row">
+          <input type="checkbox" (change)="handleSelectEvent($event,door)"/>
+        </th>
+        <td><a href="#" routerLink="/doors/{{door.id}}">{{door.id}}</a></td>
+        <td>{{door.protocol}}</td>
+        <td>{{door.sn}}</td>
+        <td>{{door.ip}}</td>
+        <td>{{door.port}}</td>
+      </tr>
+    </tbody>
+  </table>
+  <app-pagination [totalItems] = "totalItems" [pageSize]="pageable.size" (onPageLoad)="loadPage($event)"></app-pagination>
+  <div class="alert alert-success" *ngIf="msg">
+      {{msg}}
+    </div>
