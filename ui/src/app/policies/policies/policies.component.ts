@@ -50,6 +50,13 @@ export class PoliciesComponent extends PageableComponent implements OnInit {
       }
     );
   }
-
+  runAll(): void {
+    this.policySrv.runAll().subscribe(
+      _ => {
+        console.log('Run all policies now !!!');
+        this.msgSrv.addSuccess('策略成功开始运行');
+      }
+    );
+  }
 
 }

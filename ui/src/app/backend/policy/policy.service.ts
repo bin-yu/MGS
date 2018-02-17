@@ -41,5 +41,7 @@ export class PolicyService {
   deletePolicy(policy: Policy): Observable<void> {
     return this.backend.delete<void>('/policies/' + policy.id);
   }
-
+  runAll(): Observable<void> {
+    return this.backend.post<void, void>('/policies/runNow', null);
+  }
 }

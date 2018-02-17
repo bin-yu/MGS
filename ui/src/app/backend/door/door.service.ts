@@ -64,12 +64,12 @@ export class DoorService {
     return this.backend.get<Card>('/doors/' + doorId + '/cards/' + cardNo);
   }
 
-  addCard(doorId: number, card: Card): Observable<Card> {
+  addCard(doorId: number, card: Card, isUpload: boolean): Observable<Card> {
     return this.backend.postx<void>('/doors/' + doorId + '/cards', null, {
       params: {
         cid: card.cardNo,
         workerId: card.worker.id,
-        upload: false
+        upload: isUpload
       }
     });
   }

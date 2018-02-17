@@ -11,6 +11,7 @@ import { Location } from '@angular/common';
 export class CardComponent implements OnInit {
   card: Card;
   isAdd: boolean;
+  isUpload: boolean;
   constructor(private route: ActivatedRoute, private _location: Location, private doorSrv: DoorService) {
     this.card = new Card();
     this.card.worker = new Worker();
@@ -33,7 +34,7 @@ export class CardComponent implements OnInit {
 
   onSubmit(): void {
     if (this.isAdd) {
-      this.doorSrv.addCard(this.card.doorId, this.card).subscribe(
+      this.doorSrv.addCard(this.card.doorId, this.card, this.isUpload).subscribe(
         card => {
           this._location.back();
         }
