@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface WorkerRepo extends PagingAndSortingRepository<Worker, Long> {
     List<Worker> findByInBlackList(boolean inBlackList);
+
+    List<Worker> findByNameLike(String namePart);
 }

@@ -34,11 +34,16 @@ export class BackendService {
       }
     }).pipe(
       catchError(this.handleError<any>('httplist', []))
-      );
+    );
   }
   get<T>(url: string): Observable<T> {
     return this.http.get<T>(environment.apibaseurl + url).pipe(
       catchError(this.handleError<T>('httpget', null))
+    );
+  }
+  getx<T>(url: string, option?): Observable<T> {
+    return this.http.get<T>(environment.apibaseurl + url, option).pipe(
+      catchError(this.handleError<any>('httpgetx', null))
     );
   }
   post<T, R>(url: string, body: T): Observable<R> {

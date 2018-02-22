@@ -9,6 +9,7 @@ import { DoorTreeComponent } from './door-tree/door-tree.component';
 import { CardComponent } from './card/card.component';
 import { CardRightLayoutComponent } from './card-right-layout/card-right-layout.component';
 import { FormsModule } from '@angular/forms';
+import { NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
 
 const CardRoutes: Routes = [
   {
@@ -33,7 +34,8 @@ const CardRoutes: Routes = [
     FormsModule,
     RouterModule.forChild(CardRoutes),
     TreeModule,
-    ShareModule
+    ShareModule,
+    NgbTypeaheadModule
   ],
   declarations: [CardsComponent, CardsLayoutComponent, DoorTreeComponent, CardComponent, CardRightLayoutComponent]
 })

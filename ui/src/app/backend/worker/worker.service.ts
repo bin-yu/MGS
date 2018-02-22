@@ -27,5 +27,11 @@ export class WorkerService {
   deleteWorker(worker: Worker): Observable<void> {
     return this.backend.delete<void>('/workers/' + worker.id);
   }
-
+  findWorkers(nameLike: string): Observable<Worker[]> {
+    return this.backend.getx<Worker[]>('/workers/search', {
+      params: {
+        nameLike: '%' + nameLike + '%'
+      }
+    });
+  }
 }

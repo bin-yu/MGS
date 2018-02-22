@@ -1,7 +1,20 @@
+import { Observable } from 'rxjs/Observable';
+
+import {of} from 'rxjs/observable/of';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/operator/debounceTime';
+import 'rxjs/add/operator/distinctUntilChanged';
+import 'rxjs/add/operator/do';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/switchMap';
+import 'rxjs/add/operator/merge';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Worker, Card, DoorService } from '../../backend/backend.module';
+import { Worker, Card, DoorService, WorkerService } from '../../backend/backend.module';
 import { Location } from '@angular/common';
+
+
+
 
 @Component({
   selector: 'app-card',
@@ -11,10 +24,9 @@ import { Location } from '@angular/common';
 export class CardComponent implements OnInit {
   card: Card;
   isAdd: boolean;
-  isUpload: boolean;
-  constructor(private route: ActivatedRoute, private _location: Location, private doorSrv: DoorService) {
+  isUpload = false;
+  constructor(private route: ActivatedRoute, private _location: Location, private doorSrv: DoorService, private workerSrv:WorkerService) {
     this.card = new Card();
-    this.card.worker = new Worker();
   }
 
   ngOnInit() {

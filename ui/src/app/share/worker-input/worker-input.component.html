@@ -1,0 +1,4 @@
+<input [class.is-invalid]="searchFailed" type="text" placeholder="输入姓名" id="workerName" name="workerName" class="form-control"
+  [(ngModel)]="selected" [ngbTypeahead]="search" [resultFormatter]="formatter" [inputFormatter]="formatter" />
+<span *ngIf="searching">searching...</span>
+<div class="invalid-feedback" *ngIf="searchFailed">Sorry, suggestions could not be loaded.</div>
