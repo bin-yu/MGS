@@ -1,6 +1,7 @@
 <div class='row cardMain'>
   <div class="col-sm-3 col-md-3 col-lg-3 treePanel">
-    <app-door-tree (onSelected)="onDoorSelected($event)"></app-door-tree>
+    <!-- <app-door-tree (onSelected)="onDoorSelected($event)"></app-door-tree> -->
+    <app-door-tree-2 (onSelected)="onDoorSelected($event)"></app-door-tree-2>
   </div>
   <div class="col-sm-9 col-md-9 col-lg-9 cardsPanel">
     <app-card-right-layout [door]="selectedDoor"></app-card-right-layout>

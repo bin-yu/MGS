@@ -10,6 +10,8 @@ import { CardComponent } from './card/card.component';
 import { CardRightLayoutComponent } from './card-right-layout/card-right-layout.component';
 import { FormsModule } from '@angular/forms';
 import { NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
+import { DoorTree2Component } from './door-tree-2/door-tree-2.component';
+import { jqxTreeComponent } from 'jqwidgets-scripts/jqwidgets-ts/angular_jqxtree';
 
 const CardRoutes: Routes = [
   {
@@ -37,6 +39,7 @@ const CardRoutes: Routes = [
     ShareModule,
     NgbTypeaheadModule
   ],
-  declarations: [CardsComponent, CardsLayoutComponent, DoorTreeComponent, CardComponent, CardRightLayoutComponent]
+  declarations: [jqxTreeComponent,
+    CardsComponent, CardsLayoutComponent, DoorTreeComponent, CardComponent, CardRightLayoutComponent, DoorTree2Component]
 })
 export class CardsModule { }
