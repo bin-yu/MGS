@@ -27,9 +27,10 @@ export { UserService } from './user/user.service';
 export { User, Role } from './user/user';
 @NgModule({
   imports: [
-    CommonModule
+    CommonModule,
   ],
   declarations: [],
-  providers: [WorkerService, DoorService, BackendService, IncidentService, PolicyService, UserService]
+  providers: [
+    WorkerService, DoorService, BackendService, IncidentService, PolicyService, UserService]
 })
 export class BackendModule { }

@@ -2,6 +2,8 @@ package com.yyy.server.worker.repo;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,5 +11,5 @@ import org.springframework.stereotype.Repository;
 public interface WorkerRepo extends PagingAndSortingRepository<Worker, Long> {
     List<Worker> findByInBlackList(boolean inBlackList);
 
-    List<Worker> findByNameLike(String namePart);
+    Page<Worker> findByNameLike(String namePart, Pageable pageable);
 }

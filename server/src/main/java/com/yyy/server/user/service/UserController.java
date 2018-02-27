@@ -27,6 +27,11 @@ public class UserController {
         return users;
     }
 
+    @GetMapping("/search")
+    public Page<User> findUsers(String nameLike, Pageable pageable) throws Exception {
+        return repo.findByDisplayNameLike(nameLike, pageable);
+    }
+
     @GetMapping("/{id}")
     public User getUser(@PathVariable Long id) {
         return repo.findOne(id);

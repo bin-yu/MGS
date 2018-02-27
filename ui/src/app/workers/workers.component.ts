@@ -14,6 +14,7 @@ export class WorkersComponent extends PageableComponent implements OnInit {
 
   workers: Worker[];
   selectedWorkers: Set<Worker>;
+  searchStr: string;
 
   constructor(private router: Router, private workerSrv: WorkerService, private msgSrv: MessageService) {
     super();
@@ -24,12 +25,21 @@ export class WorkersComponent extends PageableComponent implements OnInit {
     this.reloadItems();
   }
   reloadItems(): void {
-    this.workerSrv.getWorkersx(this.pageable).subscribe(
-      resp => {
-        this.totalItems = resp.totalElements;
-        this.workers = resp.content;
-      }
-    );
+    if (this.searchStr && this.searchStr.length > 0) {
+      this.workerSrv.findWorkersx(this.searchStr, this.pageable).subscribe(
+        resp => {
+          this.totalItems = resp.totalElements;
+          this.workers = resp.content;
+        }
+      );
+    } else {
+      this.workerSrv.getWorkersx(this.pageable).subscribe(
+        resp => {
+          this.totalItems = resp.totalElements;
+          this.workers = resp.content;
+        }
+      );
+    }
     this.selectedWorkers.clear();
   }
   handleSelectEvent(e, worker: Worker) {
@@ -52,5 +62,12 @@ export class WorkersComponent extends PageableComponent implements OnInit {
         );
       }
     );
+  }
+  performSearch(event: any): void {
+    if (event.code === 'Enter') {
+      this.searchStr = event.target.value;
+      console.log('Searching workers with "' + this.searchStr + '"');
+      this.reloadItems();
+    }
   }
 }

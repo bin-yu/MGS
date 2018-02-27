@@ -22,6 +22,23 @@ export class UserService {
       })
     );
   }
+  findUsersx(nameLike: string, pageable: Pageable): Observable<PagedResp<User>> {
+    return this.backend.getx<PagedResp<User>>('/users/search', {
+      params: {
+        nameLike: '%' + nameLike + '%',
+        page: '' + pageable.page,
+        size: '' + pageable.size,
+        sort: pageable.sort
+      }
+    }).pipe(
+      map(resp => {
+        const users = [];
+        resp.content.forEach(p => { users.push(User.clone(p)); });
+        resp.content = users;
+        return resp;
+      })
+    );
+  }
   getUser(id: Number): Observable<User> {
     return this.backend.get<User>('/users/' + id).pipe(
       map(user => User.clone(user))

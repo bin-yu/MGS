@@ -43,9 +43,10 @@ public class WorkerController {
     }
 
     @GetMapping("/search")
-    public List<Worker> findWorkerByNameLike(@RequestParam() String nameLike) throws Exception {
-        return repo.findByNameLike(nameLike);
+    public Page<Worker> findWorkerByNameLike(@RequestParam() String nameLike, Pageable pageable) throws Exception {
+        return repo.findByNameLike(nameLike, pageable);
     }
+
     @GetMapping("/{id}")
     public Worker getWorker(@PathVariable Long id) {
         return repo.findOne(id);
@@ -71,8 +72,8 @@ public class WorkerController {
 
     @GetMapping("/{id}/incidents")
     public List<Incident> getIncidents(@PathVariable Long id) {
-        Worker worker=repo.findOne(id);
-        if(worker == null){
+        Worker worker = repo.findOne(id);
+        if (worker == null) {
             throw new IllegalArgumentException("worker not found : " + id);
         }
         return incRepo.findBySubject(worker);

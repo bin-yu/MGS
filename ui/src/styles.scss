@@ -12,7 +12,7 @@
 }
 
 /* For angular-tree-component */
-.node-content-wrapper, .tree-children {
+/* .node-content-wrapper, .tree-children {
   position: relative;
 }
 
@@ -51,4 +51,10 @@ tree-node:last-child > .tree-node > .tree-children::after {
 
 .toggle-children {
   z-index: 1;
+} */
+/**
+For ng2-tree
+*/
+.tree .node-value{
+  cursor: pointer;
 }

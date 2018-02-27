@@ -16,11 +16,13 @@ export class CardRightLayoutComponent implements OnInit {
 
   @Input()
   set door(door: Door) {
-    let url: string;
-    url = './';
     if (door) {
-      url += door.id;
+      let url: string;
+      url = './';
+      if (door) {
+        url += door.id;
+      }
+      this.router.navigate([url], { relativeTo: this.route });
     }
-    this.router.navigate([url], { relativeTo: this.route });
   }
 }

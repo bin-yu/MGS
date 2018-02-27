@@ -1,3 +1,4 @@
+import { Pageable } from './../../backend/pageable';
 import { Observable } from 'rxjs/Observable';
 
 import { of } from 'rxjs/observable/of';
@@ -20,7 +21,7 @@ export class WorkerInputComponent implements OnInit {
 
   _worker: Worker;
   @Output() selectedChange = new EventEmitter();
-
+  pageable = new Pageable(0, 10, 'id');
   search: any;
   searching = false;
   searchFailed = false;
@@ -33,7 +34,7 @@ export class WorkerInputComponent implements OnInit {
         .distinctUntilChanged()
         .do(() => this.searching = true)
         .switchMap(term =>
-          this.workerSrv.findWorkers(term)
+          this.workerSrv.findWorkers(term, this.pageable)
             .do(() => this.searchFailed = false)
             .catch(() => {
               this.searchFailed = true;

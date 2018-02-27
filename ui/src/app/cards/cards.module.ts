@@ -2,7 +2,7 @@ import { ShareModule } from './../share/share.module';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
-import { TreeModule } from 'angular-tree-component';
+import { TreeModule } from 'ng2-tree';
 import { CardsComponent } from './cards/cards.component';
 import { CardsLayoutComponent } from './cards-layout/cards-layout.component';
 import { DoorTreeComponent } from './door-tree/door-tree.component';

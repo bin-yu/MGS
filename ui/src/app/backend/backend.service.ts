@@ -4,15 +4,14 @@ import { of } from 'rxjs/observable/of';
 import { catchError, map, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { PagedResp } from './paged-resp';
-import { Injectable } from '@angular/core';
-import { MessageService } from '../messages/messages.module';
+import { Injectable, Inject } from '@angular/core';
 import { Pageable } from './pageable';
 
 
 @Injectable()
 export class BackendService {
 
-  constructor(protected http: HttpClient, protected msgSrv: MessageService) { }
+  constructor(protected http: HttpClient) { }
 
   list<T>(url: string): Observable<T[]> {
     return this.http.get<PagedResp<T>>(environment.apibaseurl + url).pipe(
@@ -74,10 +73,6 @@ export class BackendService {
      */
   protected /*  */handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
-
-      // TODO: send the error to remote logging infrastructure
-      console.error(JSON.stringify(error)); // log to console instead
-      this.msgSrv.addFail(operation + ' failed, reason :' + (error.error) ? error.error.message : error.message);
       // Let the app keep running by returning an empty result.
       return of(result as T);
     };

@@ -57,7 +57,8 @@ public class SecurityConfig {
     @Order(Ordered.HIGHEST_PRECEDENCE + 1)
     public static class FrontendConfiguration extends WebSecurityConfigurerAdapter {
         protected void configure(HttpSecurity http) throws Exception {
-            http.antMatcher("/**").authorizeRequests().antMatchers("/css/**").permitAll().anyRequest().authenticated().and().formLogin().loginPage("/login").permitAll();
+            http.antMatcher("/**").authorizeRequests().antMatchers("/css/**", "/assets/**", "/*.*").permitAll().anyRequest().authenticated().and().formLogin().loginPage("/login")
+                                            .permitAll();
             http.exceptionHandling().authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"));
             http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.ALWAYS);
             //http.logout().logoutUrl("/api/logout").logoutSuccessUrl("/login");

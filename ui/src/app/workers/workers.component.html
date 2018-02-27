@@ -3,7 +3,7 @@
   <button class="btn btn-primary " type="button" routerLink="/workers/new" >添加</button>
   <button class="btn btn-primary " type="button" (click)="performDelete()">删除</button>
   <button class="btn btn-primary " type="button">批量导入</button>
-  <input type="text" class="form-control" placeholder="查找...">
+  <input type="text" class="form-control" placeholder="查找姓名..." (keyup) = "performSearch($event)">
 </div>
 <table class="table table-bordered table-hover ">
   <thead>

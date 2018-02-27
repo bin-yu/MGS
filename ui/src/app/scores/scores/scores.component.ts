@@ -11,6 +11,7 @@ export class ScoresComponent extends PageableComponent implements OnInit {
 
   workers: Worker[];
 
+  searchStr: string;
   constructor(private workerSrv: WorkerService) {
     super();
   }
@@ -19,12 +20,28 @@ export class ScoresComponent extends PageableComponent implements OnInit {
     this.reloadItems();
   }
   reloadItems(): void {
-    this.workerSrv.getWorkersx(this.pageable).subscribe(
-      resp => {
-        this.totalItems = resp.totalElements;
-        this.workers = resp.content;
-      }
-    );
+    if (this.searchStr && this.searchStr.length > 0) {
+      this.workerSrv.findWorkersx(this.searchStr, this.pageable).subscribe(
+        resp => {
+          this.totalItems = resp.totalElements;
+          this.workers = resp.content;
+        }
+      );
+    } else {
+      this.workerSrv.getWorkersx(this.pageable).subscribe(
+        resp => {
+          this.totalItems = resp.totalElements;
+          this.workers = resp.content;
+        }
+      );
+    }
+  }
+  performSearch(event: any): void {
+    if (event.code === 'Enter') {
+      this.searchStr = event.target.value;
+      console.log('Searching workers with "' + this.searchStr + '"');
+      this.reloadItems();
+    }
   }
 
 }

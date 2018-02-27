@@ -1,3 +1,4 @@
+import { map } from 'rxjs/operators';
 import { Pageable } from './../pageable';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
@@ -27,11 +28,21 @@ export class WorkerService {
   deleteWorker(worker: Worker): Observable<void> {
     return this.backend.delete<void>('/workers/' + worker.id);
   }
-  findWorkers(nameLike: string): Observable<Worker[]> {
-    return this.backend.getx<Worker[]>('/workers/search', {
+  findWorkersx(nameLike: string, pageable: Pageable): Observable<PagedResp<Worker>> {
+    return this.backend.getx<PagedResp<Worker>>('/workers/search', {
       params: {
-        nameLike: '%' + nameLike + '%'
+        nameLike: '%' + nameLike + '%',
+        page: '' + pageable.page,
+        size: '' + pageable.size,
+        sort: pageable.sort
       }
     });
+  }
+  findWorkers(nameLike: string, pageable: Pageable): Observable<Worker[]> {
+    return this.findWorkersx(nameLike, pageable).pipe(
+      map(
+        resp => resp.content
+      )
+    );
   }
 }

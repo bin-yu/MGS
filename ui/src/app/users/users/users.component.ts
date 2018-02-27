@@ -12,6 +12,9 @@ export class UsersComponent extends PageableComponent implements OnInit {
 
   users: User[];
   selectedUsers: Set<User>;
+
+  searchStr: string;
+
   constructor(private router: Router, private userSrv: UserService, private msgSrv: MessageService) {
     super();
     this.selectedUsers = new Set<User>();
@@ -21,12 +24,21 @@ export class UsersComponent extends PageableComponent implements OnInit {
     this.reloadItems();
   }
   reloadItems(): void {
-    this.userSrv.getUsersx(this.pageable).toPromise().then(
-      resp => {
-        this.totalItems = resp.totalElements;
-        this.users = resp.content;
-      }
-    );
+    if (this.searchStr && this.searchStr.length > 0) {
+      this.userSrv.findUsersx(this.searchStr, this.pageable).subscribe(
+        resp => {
+          this.totalItems = resp.totalElements;
+          this.users = resp.content;
+        }
+      );
+    } else {
+      this.userSrv.getUsersx(this.pageable).toPromise().then(
+        resp => {
+          this.totalItems = resp.totalElements;
+          this.users = resp.content;
+        }
+      );
+    }
     this.selectedUsers.clear();
   }
   handleSelectEvent(e, user: User) {
@@ -49,5 +61,11 @@ export class UsersComponent extends PageableComponent implements OnInit {
       }
     );
   }
-
+  performSearch(event: any): void {
+    if (event.code === 'Enter') {
+      this.searchStr = event.target.value;
+      console.log('Searching users with "' + this.searchStr + '"');
+      this.reloadItems();
+    }
+  }
 }

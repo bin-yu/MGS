@@ -1,3 +1,4 @@
+import { ActivatedRoute } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 import { Door } from '../../backend/backend.module';
 
@@ -8,9 +9,11 @@ import { Door } from '../../backend/backend.module';
 })
 export class CardsLayoutComponent implements OnInit {
   selectedDoor: Door;
-  constructor() { }
+  doorId: number;
+  constructor(private route: ActivatedRoute) { }
 
   ngOnInit() {
+    this.doorId = +this.route.snapshot.paramMap.get('doorId');
   }
 
   onDoorSelected(door: Door): void {
