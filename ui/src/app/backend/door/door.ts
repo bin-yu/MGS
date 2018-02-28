@@ -5,4 +5,5 @@ export class Door {
     password: string;
     ip: string;
     port: number;
+    label: string;
 }

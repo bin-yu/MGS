@@ -26,6 +26,8 @@ public class Door implements Serializable {
     private String ip;
     @Column(nullable = false)
     private int port;
+    @Column(nullable = true)
+    private String label;
 
 
     public String getSn() {
@@ -70,6 +72,14 @@ public class Door implements Serializable {
 
     public void setProtocol(String protocol) {
         this.protocol = protocol;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 
 }

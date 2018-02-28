@@ -35,7 +35,7 @@ export class DoorTree2Component implements AfterViewInit, OnInit {
         doors.forEach(door => {
           const child: any = door;
           child.icon = DOOR_ICON;
-          child.label = child.sn;
+          child.label = (child.label == null) ? child.sn : child.label;
           if (selectFirst || child.id === doorId) {
             child.selected = true;
             selectFirst = false;
