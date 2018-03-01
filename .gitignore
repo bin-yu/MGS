@@ -3,3 +3,4 @@
 /server/db
 /server/.mvn
 /server/testing data.txt
+/server/src/main/resources/static/*
