@@ -7,10 +7,16 @@ import { DoorComponent } from './doors/door/door.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/workers', pathMatch: 'full' },
-  { path: 'workers', component: WorkersComponent },
-  { path: 'workers/:id', component: WorkerComponent },
-  { path: 'doors', component: DoorsComponent },
-  { path: 'doors/:id', component: DoorComponent },
+  {
+    path: 'doors',
+    loadChildren: 'app/doors/doors.module#DoorsModule',
+    data: { preload: false }
+  },
+  {
+    path: 'workers',
+    loadChildren: 'app/workers/workers.module#WorkersModule',
+    data: { preload: false }
+  },
   {
     path: 'incidents',
     loadChildren: 'app/incidents/incidents.module#IncidentsModule',

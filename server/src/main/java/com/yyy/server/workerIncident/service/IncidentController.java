@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.yyy.server.policy.executor.PolicyExecutor;
 import com.yyy.server.workerIncident.repo.Incident;
 import com.yyy.server.workerIncident.repo.IncidentRepo;
 
@@ -23,6 +24,8 @@ import com.yyy.server.workerIncident.repo.IncidentRepo;
 public class IncidentController {
     @Autowired
     private IncidentRepo repo;
+    @Autowired
+    private PolicyExecutor policyExec;
 
     @GetMapping
     public Page<Incident> getIncidents(Pageable pageable) throws Exception {
@@ -39,7 +42,7 @@ public class IncidentController {
     public Incident addIncident(@RequestBody Incident incident) {
 
         incident.setRecordTime(new Date());
-        return repo.save(incident);
+        return createOrUpdateIncident(incident);
     }
 
     @PutMapping("/{id}")
@@ -48,7 +51,7 @@ public class IncidentController {
             throw new IllegalArgumentException("Mismatched id between path variable and request body.");
         }
         incident.setRecordTime(new Date());
-        return repo.save(incident);
+        return createOrUpdateIncident(incident);
     }
 
     @DeleteMapping("/{id}")
@@ -57,4 +60,9 @@ public class IncidentController {
         repo.delete(id);
     }
 
+    private Incident createOrUpdateIncident(Incident incident) {
+        incident = repo.save(incident);
+        policyExec.runOnWorker(incident.getSubject());
+        return incident;
+    }
 }

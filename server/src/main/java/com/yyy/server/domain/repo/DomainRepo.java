@@ -1,4 +1,4 @@
-package com.yyy.server.site.repo;
+package com.yyy.server.domain.repo;
 
 import org.springframework.data.repository.PagingAndSortingRepository;
 

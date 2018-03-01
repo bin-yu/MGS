@@ -1,4 +1,4 @@
-package com.yyy.server.site.repo;
+package com.yyy.server.domain.repo;
 
 import java.io.Serializable;
 import java.util.List;
@@ -14,7 +14,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonSetter;
 @Entity
 public class Domain implements Serializable {
     /**
@@ -26,7 +25,9 @@ public class Domain implements Serializable {
     private Long id;
     @Column(nullable = true)
     private String name;
+    @Column(nullable = false)
     private String label;
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PARENT_ID", referencedColumnName = "ID")
     private Domain parent;
@@ -57,12 +58,11 @@ public class Domain implements Serializable {
         return children;
     }
 
-    @JsonIgnore
+
     public Domain getParent() {
         return parent;
     }
 
-    @JsonSetter
     public void setParent(Domain parent) {
         this.parent = parent;
     }

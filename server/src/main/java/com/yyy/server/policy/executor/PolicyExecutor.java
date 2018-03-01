@@ -2,6 +2,7 @@ package com.yyy.server.policy.executor;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,48 +46,71 @@ public class PolicyExecutor {
     @Value("${mgs.policy.executor.interval-hours}")
     private int intervalHours;
     private ScheduledExecutorService executorPool;
-    private boolean isRunning = false;
+    private boolean isFullScheduled = false;
 
 
     @PostConstruct
     public void start() {
         logger.info("Starting policy executor...intervalHours=" + intervalHours);
 
-        executorPool = Executors.newScheduledThreadPool(1, new ThreadFactory() {
+        executorPool = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
             @Override
             public Thread newThread(Runnable r) {
                 return new Thread(r, "PolicyExecutor");
             }
 
         });
-        executorPool.scheduleWithFixedDelay(() -> execute(), 0, intervalHours, TimeUnit.HOURS);
+        executorPool.scheduleWithFixedDelay(() -> execute(null), 0, intervalHours, TimeUnit.HOURS);
     }
 
-    public void runNow() {
-        if (isRunning) {
-            logger.info("Policy is currently running, ignore runNow operation!");
+    public synchronized void runNow() {
+        if (isFullScheduled) {
+            logger.info("Full Policy Execution is currently running, ignore runNow operation!");
         } else {
-            executorPool.execute(() -> execute());
-            logger.info("Policy runNow scheduled!");
+            isFullScheduled = true;
+            executorPool.execute(() -> execute(null));
+            logger.info("Full Policy Execution scheduled!");
         }
     }
 
-    protected void execute() {
+    public void runOnWorker(Worker worker) {
+        executorPool.execute(() -> execute(worker));
+        logger.info("Policy runNow scheduled for worker " + worker);
+    }
+
+    protected void execute(Worker worker) {
         try {
-            isRunning = true;
-            executePolicies();
-            uploadBlackListCardsToDoorSystems();
+            Iterable<Worker> workerIter = null;
+            if (worker == null) {
+                workerIter = workerRepo.findAll();
+                logger.info("Running policy against all the workers!");
+            } else {
+                worker = workerRepo.findOne(worker.getId());
+                logger.info("Running policy against worker:" + worker);
+                workerIter = Collections.singletonList(worker);
+            }
+            executePolicies(workerIter);
+
+            //upload blacklist cards to door systems
+            Map<Long, List<Card>> doorToCards = new HashMap<Long, List<Card>>();
+            if (worker == null) {
+                findCardsToUpdate(doorToCards);
+            } else {
+                if (worker.getInBlackList()) {
+                    addWorkerCardsToMap(doorToCards, worker);
+                }
+            }
+            uploadBlackListCardsToDoorSystems(doorToCards);
         } catch (Throwable t) {
             logger.warn("Failed to execute policy!", t);
         } finally {
-            isRunning = false;
+            isFullScheduled = false;
         }
     }
 
 
-    private void uploadBlackListCardsToDoorSystems() {
-        logger.info("Start uploading blacklist...");
-        Map<Long, List<Card>> doorToCards = findCardsToUpdate();
+    private void uploadBlackListCardsToDoorSystems(Map<Long, List<Card>> doorToCards) {
+        logger.info("Start uploading blacklist...size=" + doorToCards.size());
         doorToCards.forEach((doorId, cards) -> {
             try {
                 DeleteCardsFromDoor(doorId, cards);
@@ -125,41 +149,51 @@ public class PolicyExecutor {
     }
 
 
-    private Map<Long, List<Card>> findCardsToUpdate() {
-        Map<Long, List<Card>> doorToCards = new HashMap<Long, List<Card>>();
+    private void findCardsToUpdate(Map<Long, List<Card>> doorToCards) {
         List<Worker> workers = workerRepo.findByInBlackList(true);
         if (workers == null || workers.size() == 0) {
-            logger.info("Ignore uploading blacklist because there is no worker in blacklist.");
-            return doorToCards;
+            logger.info("No cards to update because there is no worker in blacklist.");
+            return;
         }
         workers.forEach(worker -> {
-            List<Card> cards = cardRepo.findByWorker(worker);
-            cards.forEach(card -> {
-                if (card.getInBlackList()) {
-                    logger.info("Ignore updating this card to blacklist because it has been updated:" + card);
-                } else {
-                    logger.info("Adding this card to blacklist:" + card);
-                    List<Card> cardList = doorToCards.get(card.getDoorId());
-                    if (cardList == null) {
-                        cardList = new ArrayList<Card>();
-                        doorToCards.put(card.getDoorId(), cardList);
-                    }
-                    cardList.add(card);
-                }
-            });
+            addWorkerCardsToMap(doorToCards, worker);
         });
-        return doorToCards;
+    }
+
+    private void addWorkerCardsToMap(Map<Long, List<Card>> doorToCards, Worker worker) {
+        List<Card> cards = cardRepo.findByWorker(worker);
+        cards.forEach(card -> {
+            if (card.getInBlackList()) {
+                logger.info("Ignore updating this card to blacklist because it has been updated:" + card);
+            } else {
+                addCardToMap(doorToCards, card);
+            }
+        });
+    }
+
+    private void addCardToMap(Map<Long, List<Card>> doorToCards, Card card) {
+        logger.info("Adding this card to blacklist:" + card);
+        List<Card> cardList = doorToCards.get(card.getDoorId());
+        if (cardList == null) {
+            cardList = new ArrayList<Card>();
+            doorToCards.put(card.getDoorId(), cardList);
+        }
+        cardList.add(card);
     }
 
 
-    private void executePolicies() throws IOException {
+    private void executePolicies(Iterable<Worker> workerIter) throws IOException {
         logger.info("Start Policy Executing...");
         List<Policy> policies = policyRepo.findAll();
         if (policies == null || policies.size() == 0) {
             logger.info("Ignore executing policies because the policy cnt is 0!");
         }
         logger.info("Policy cnt = " + policies.size());
-        Iterable<Worker> workerIter = workerRepo.findAll();
+        executePoliciesOnWorkers(policies, workerIter);
+        logger.info("End Policy Executing...");
+    }
+
+    private void executePoliciesOnWorkers(List<Policy> policies, Iterable<Worker> workerIter) {
         workerIter.forEach(worker -> {
             policies.forEach(policy -> {
                 if (policy.getCondition().isSatisfiedBy(worker)) {
@@ -170,7 +204,6 @@ public class PolicyExecutor {
                 }
             });
         });
-        logger.info("End Policy Executing...");
     }
 
 }

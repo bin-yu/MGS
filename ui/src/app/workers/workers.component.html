@@ -1,6 +1,6 @@
 
 <div class="input-group ">
-  <button class="btn btn-primary " type="button" routerLink="/workers/new" >添加</button>
+  <button class="btn btn-primary " type="button" routerLink="./new" >添加</button>
   <button class="btn btn-primary " type="button" (click)="performDelete()">删除</button>
   <button class="btn btn-primary " type="button">批量导入</button>
   <input type="text" class="form-control" placeholder="查找姓名..." (keyup) = "performSearch($event)">
@@ -22,7 +22,7 @@
       <th scope="row">
         <input type="checkbox" (change)="handleSelectEvent($event,worker)"/>
       </th>
-      <td><a href="#" routerLink="/workers/{{worker.id}}">{{worker.name}}</a></td>
+      <td><a href="#" routerLink="./{{worker.id}}">{{worker.name}}</a></td>
       <td>{{worker.id}}</td>
       <td>{{worker.idNo}}</td>
       <td>{{worker.phoneNums}}</td>

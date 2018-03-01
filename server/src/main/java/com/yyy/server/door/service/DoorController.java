@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -99,6 +100,7 @@ public class DoorController {
     }
 
     @PostMapping("/{did}/cards")
+    @Transactional
     public Card addCard(@PathVariable Long did, @RequestParam Long cid, @RequestParam Long workerId, @RequestParam(required = false, defaultValue = "false") boolean upload)
                                     throws IOException {
         Door door = repo.findOne(did);
@@ -114,13 +116,19 @@ public class DoorController {
         logger.info("New card added:" + card);
         if (upload) {
             DoorSystem doorSys = DoorSystemFactory.createInstance(door);
-            doorSys.addCard(new CardData[] {new CardData(cid)});
-            logger.info("New card uploaded to door system :" + cid);
+            if (null != doorSys.readCardData(cid)) {
+                logger.warn("Card " + cid + " already exist in door " + door.getLabel());
+            } else {
+                logger.info("Adding new card " + cid + " to door " + door.getLabel());
+                doorSys.addCard(new CardData[] {new CardData(cid)});
+                logger.info("New card uploaded to door system :" + cid);
+            }
         }
         return card;
     }
 
     @DeleteMapping("/{did}/cards/{cid}")
+    @Transactional
     public void delCard(@PathVariable Long did, @PathVariable Long cid, @RequestParam(required = false, defaultValue = "false") boolean upload) throws IOException {
         CardKey key = new CardKey(did, cid);
         cardRepo.delete(key);

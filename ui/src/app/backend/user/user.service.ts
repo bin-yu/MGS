@@ -61,4 +61,8 @@ export class UserService {
   logout(): Observable<void> {
     return this.backend.post<void, void>('/logout', null);
   }
+
+  checkLoginStatus(): Observable<string> {
+    return this.backend.getx<string>('/status', { responseType: 'text' });
+  }
 }

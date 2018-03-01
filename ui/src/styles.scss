@@ -1,4 +1,7 @@
-/* @import "~@angular/material/prebuilt-themes/indigo-pink.css"; */
+.btn {
+  cursor:pointer;
+}
+
 
 //f for all the tables
 .mgs-table{
@@ -57,4 +60,11 @@ For ng2-tree
 */
 .tree .node-value{
   cursor: pointer;
+}
+
+/**
+For Jqx-widget tree
+*/
+.jqx-widget-content {
+  font-size: 16px;
 }
