@@ -4,7 +4,7 @@ spring:
   application:
     name: MGS
 spring.datasource:
-  url: jdbc:hsqldb:file:db/mgs;shutdown=true
+  url: jdbc:hsqldb:mem:test;shutdown=true
   username: SA
 spring.jpa.hibernate.ddl-auto: update
 spring.jpa.show-sql: true
@@ -18,4 +18,17 @@ security.basic.enabled: false
 
 ---
 spring:
+  profiles: prod
+  datasource:
+    url: jdbc:mysql://localhost:3306/mgs?useSSL=false
+    username: root
+    password: symantec12
+    driver-class-name: com.mysql.jdbc.Driver
+  jpa.properties.hibernate.dialect: org.hibernate.dialect.MySQL5Dialect
+  
+---
+spring:
   profiles: test
+  datasource:
+    url: jdbc:hsqldb:file:db/mgs;shutdown=true
+    username: SA
