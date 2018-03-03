@@ -1,4 +1,6 @@
-package com.yyy.batchscripts;
+package com.yyy.batch;
+
+import java.io.File;
 
 import javax.sql.DataSource;
 
@@ -10,19 +12,25 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
 
 @Configuration
-@ComponentScan("com.yyy.batchscripts")
+@ComponentScan()
 public class BatchConfig {
     @Value("${spring.datasource.url}")
     String dbUrl;
     @Value("${spring.datasource.username}")
     String user;
+
     @Bean
     public static PropertySourcesPlaceholderConfigurer properties() {
         PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer = new PropertySourcesPlaceholderConfigurer();
         YamlPropertiesFactoryBean yaml = new YamlPropertiesFactoryBean();
-        yaml.setResources(new ClassPathResource("application.yml"));
+        if (new File("application.yml").exists()) {
+            yaml.setResources(new ClassPathResource("application.yml"), new FileSystemResource("application.yml"));
+        } else {
+            yaml.setResources(new ClassPathResource("application.yml"));
+        }
         propertySourcesPlaceholderConfigurer.setProperties(yaml.getObject());
         return propertySourcesPlaceholderConfigurer;
     }
@@ -34,6 +42,7 @@ public class BatchConfig {
         ds.setUrl(dbUrl);
         ds.setUsername(user);
         ds.setInitialSize(0);
+        ds.setMaxIdle(0);
         ds.setMaxTotal(1);
         return ds;
     }

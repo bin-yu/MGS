@@ -32,7 +32,7 @@ public class Worker implements Serializable {
     @Column(nullable = false)
     private String idNo;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String idType;
 
     @Column(nullable = true)
@@ -43,7 +43,7 @@ public class Worker implements Serializable {
 
     @Column(nullable = true)
     private String employer;
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition ="BOOLEAN DEFAULT FALSE")
     private Boolean inBlackList = false;
 
 

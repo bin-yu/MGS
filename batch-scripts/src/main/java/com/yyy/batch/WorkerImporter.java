@@ -1,15 +1,12 @@
-package com.yyy.batchscripts;
+package com.yyy.batch;
 
-import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectOutputStream;
 import java.io.Reader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -24,37 +21,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Service;
 
-@Service
-public class WorkerImporter {
+@Service("worker")
+public class WorkerImporter implements TableImporter {
     @Autowired
     DataSource ds;
-
-    static enum ColType {
-        STRING {
-            @Override
-            Object parseString(String value) {
-                return value;
-            }
-        },
-        STRING_ARRAY {
-            @Override
-            Object parseString(String value) {
-                String[] arr = value.split(",");
-                try (ByteArrayOutputStream b = new ByteArrayOutputStream()) {
-                    try (ObjectOutputStream o = new ObjectOutputStream(b)) {
-                        o.writeObject(arr);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    return b.toByteArray();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-                return new byte[0];
-            }
-        };
-        abstract Object parseString(String value);
-    }
 
     static Map<String, ColType> colTypes = new HashMap<String, ColType>();
     static {
@@ -74,6 +44,7 @@ public class WorkerImporter {
         ApplicationContext ctx = new AnnotationConfigApplicationContext(BatchConfig.class);
         WorkerImporter script = ctx.getBean(WorkerImporter.class);
         script.execute(args[0]);
+        System.exit(0);
     }
 
     public void execute(String csvFile) throws IOException, SQLException {
@@ -85,8 +56,8 @@ public class WorkerImporter {
             List<String> headers = null;
             for (CSVRecord record : records) {
                 if (ps == null) {
-                    headers = toList(record);
-                    String sql = "INSERT INTO WORKER(" + toColumnNames(record) + ") VALUES (" + genQuestionMarks(record.size()) + ")";
+                    headers = CSVUtils.toList(record);
+                    String sql = "INSERT INTO WORKER(" + CSVUtils.toColumnNames(record) + ") VALUES (" + CSVUtils.genQuestionMarks(record.size()) + ")";
                     System.out.println(sql);
                     ps = con.prepareStatement(sql);
                 } else {
@@ -116,29 +87,6 @@ public class WorkerImporter {
             con.close();
         }
 
-    }
-
-    private List<String> toList(CSVRecord record) {
-        List<String> rt = new ArrayList<String>(record.size());
-        record.forEach(cell -> {
-            rt.add(cell);
-        });
-        return rt;
-    }
-    private String toColumnNames(CSVRecord record) {
-        StringBuilder sb = new StringBuilder();
-        record.forEach(cell -> {
-            sb.append(cell).append(',');
-        });
-        return sb.substring(0, sb.length() - 1);
-    }
-
-    private String genQuestionMarks(long cnt) {
-        StringBuilder sb = new StringBuilder();
-        while (cnt-- > 0) {
-            sb.append('?').append(',');
-        }
-        return sb.substring(0, sb.length() - 1);
     }
 
 }

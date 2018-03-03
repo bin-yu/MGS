@@ -1,1 +1,61 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>民工信息管理系统</title><base href="/"><link rel="icon" type="image/x-icon" href="favicon.ico"><link href="styles.37154cd1809619493c3f.bundle.css" rel="stylesheet"/></head><app-root></app-root></html><script type="text/javascript" src="inline.8e23fbefcf59fafea75a.bundle.js"></script><script type="text/javascript" src="polyfills.490c80472f66b9d087cb.bundle.js"></script><script type="text/javascript" src="scripts.825b7a45416ec49ccf8d.bundle.js"></script><script type="text/javascript" src="main.510f5da1c8939e1bf3af.bundle.js"></script>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>民工信息管理系统</title><base href="/"><link rel="icon" type="image/x-icon" href="favicon.ico"><style type="text/css">body,
+    html {
+      height: 100%;
+    }
+
+    .app-loading {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+    }
+
+    .app-loading .logo {
+      width: 124px;
+      height: 55px;
+      background: url('/assets/img/logo-s.png') center center no-repeat;
+    }
+
+    .app-loading .spinner {
+      height: 200px;
+      width: 200px;
+      animation: rotate 2s linear infinite;
+      transform-origin: center center;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      margin: auto;
+    }
+
+    .app-loading .spinner .path {
+      stroke-dasharray: 1, 200;
+      stroke-dashoffset: 0;
+      animation: dash 1.5s ease-in-out infinite;
+      stroke-linecap: round;
+      stroke: #007DB8;
+    }
+
+    @keyframes rotate {
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes dash {
+      0% {
+        stroke-dasharray: 1, 200;
+        stroke-dashoffset: 0;
+      }
+      50% {
+        stroke-dasharray: 89, 200;
+        stroke-dashoffset: -35px;
+      }
+      100% {
+        stroke-dasharray: 89, 200;
+        stroke-dashoffset: -124px;
+      }
+    }</style><link href="styles.2daf72337277fd47bc33.bundle.css" rel="stylesheet"/></head><body><app-root><div class="app-loading"><!-- <img src="/assets/img/logo.png" width="124" height="" alt=""> --><div class="logo"></div><svg class="spinner" viewBox="25 25 50 50"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/></svg></div></app-root><script type="text/javascript" src="inline.a72e16881ccc68e5b2fc.bundle.js"></script><script type="text/javascript" src="polyfills.796d6544e2381b3525cb.bundle.js"></script><script type="text/javascript" src="scripts.825b7a45416ec49ccf8d.bundle.js"></script><script type="text/javascript" src="main.1961a2adf920ef1603f5.bundle.js"></script></body></html>

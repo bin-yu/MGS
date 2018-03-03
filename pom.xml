@@ -10,6 +10,7 @@
     <modules>
         <module>ui</module>
         <module>server</module>
+		<module>batch-scripts</module>
     </modules>
     <packaging>pom</packaging>
 

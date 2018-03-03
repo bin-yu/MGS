@@ -28,7 +28,7 @@ public class Card implements Serializable{
     @ManyToOne
     @JoinColumn(name = "WORKER_ID", referencedColumnName = "ID")
     private Worker worker;
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean inBlackList = false;
 
     public Card() {
