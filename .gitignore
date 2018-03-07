@@ -4,3 +4,4 @@
 /server/.mvn
 /server/testing data.txt
 /server/src/main/resources/static/*
+/door-proxy/doorproxy/.settings

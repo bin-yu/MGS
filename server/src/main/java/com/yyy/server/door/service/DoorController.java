@@ -129,7 +129,7 @@ public class DoorController {
 
     @DeleteMapping("/{did}/cards/{cid}")
     @Transactional
-    public void delCard(@PathVariable Long did, @PathVariable Long cid, @RequestParam(required = false, defaultValue = "false") boolean upload) throws IOException {
+    public void delCard(@PathVariable Long did, @PathVariable Long cid, @RequestParam(required = false, defaultValue = "true") boolean upload) throws IOException {
         CardKey key = new CardKey(did, cid);
         cardRepo.delete(key);
         logger.info("Card deleted:" + key);

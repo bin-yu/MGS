@@ -4,7 +4,7 @@ spring:
   application:
     name: MGS
 spring.datasource:
-  url: jdbc:hsqldb:mem:test;shutdown=true
+  url: jdbc:hsqldb:file:db/mgs;shutdown=true
   username: SA
 spring.jpa.hibernate.ddl-auto: update
 spring.jpa.show-sql: true
@@ -14,6 +14,11 @@ mgs:
   policy:
     executor:
       interval-hours: 1
+  door:
+    proxy-server:
+      port: 8443
+      thread-cnt: 20
+    
 security.basic.enabled: false
 
 ---
@@ -28,7 +33,7 @@ spring:
   
 ---
 spring:
-  profiles: test
+  profiles: ut
   datasource:
-    url: jdbc:hsqldb:file:db/mgs;shutdown=true
+    url: jdbc:hsqldb:mem:test;shutdown=true
     username: SA

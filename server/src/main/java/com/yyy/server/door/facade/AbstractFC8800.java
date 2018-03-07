@@ -43,10 +43,24 @@ public abstract class AbstractFC8800 implements DoorSystem {
     private CardData _readCardData(long cardNo, boolean existingConnection) throws IOException {
         logger.info("[" + sn + "]DOOR READ CARD..." + cardNo);
         FC8800frame oRet = sendCmd(7, 3, 1, 5, ConverterTool.longToBytes(cardNo, 5, true), existingConnection);
-        return new CardData(oRet.GetDatabuff(), oRet.GetDataLen());
+        byte[] data = oRet.GetDatabuff();
+        int dataLen = oRet.GetDataLen();
+        if (isAllFF(data)) {
+            return null;
+        }
+        return new CardData(data, dataLen);
     }
 
 
+
+    private boolean isAllFF(byte[] data) {
+        for (int i = 0; i < data.length; i++) {
+            if (data[i] != -1) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     @Override
     public CardAreaStatus readCardAreaStatus() throws IOException {
