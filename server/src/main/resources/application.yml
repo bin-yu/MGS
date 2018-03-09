@@ -17,7 +17,9 @@ mgs:
   door:
     proxy-server:
       port: 8443
-      thread-cnt: 20
+      accept-thread-cnt: 20
+      keystore:
+        password: changeme
     
 security.basic.enabled: false
 

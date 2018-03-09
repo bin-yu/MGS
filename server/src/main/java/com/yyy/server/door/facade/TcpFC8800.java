@@ -11,8 +11,8 @@ import org.slf4j.LoggerFactory;
 
 public class TcpFC8800 extends AbstractFC8800 {
     private static Logger logger = LoggerFactory.getLogger(TcpFC8800.class);
-    private String ip;
-    private int port;
+    protected String ip;
+    protected int port;
     private Socket socket;
     private InputStream in;
     private OutputStream out;

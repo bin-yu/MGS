@@ -2,6 +2,8 @@ package com.yyy.server.policy.service;
 
 import java.io.IOException;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,7 +35,11 @@ public class PolicyController {
 
     @GetMapping("/{id}")
     public Policy getPolicy(@PathVariable Long id) throws IOException {
-        return repo.findOne(id);
+        Policy policy = repo.findOne(id);
+        if(policy==null){
+        	throw new EntityNotFoundException("policy not found for id : "+id);
+        }
+		return policy;
     }
 
     @PostMapping()

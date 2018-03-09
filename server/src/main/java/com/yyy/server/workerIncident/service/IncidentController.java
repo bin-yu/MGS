@@ -2,6 +2,8 @@ package com.yyy.server.workerIncident.service;
 
 import java.util.Date;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,49 +22,53 @@ import com.yyy.server.workerIncident.repo.Incident;
 import com.yyy.server.workerIncident.repo.IncidentRepo;
 
 @RestController
-@RequestMapping({"/incidents"})
+@RequestMapping({ "/incidents" })
 public class IncidentController {
-    @Autowired
-    private IncidentRepo repo;
-    @Autowired
-    private PolicyExecutor policyExec;
+	@Autowired
+	private IncidentRepo repo;
+	@Autowired
+	private PolicyExecutor policyExec;
 
-    @GetMapping
-    public Page<Incident> getIncidents(Pageable pageable) throws Exception {
-        Page<Incident> incidents = repo.findAll(pageable);
-        return incidents;
-    }
+	@GetMapping
+	public Page<Incident> getIncidents(Pageable pageable) throws Exception {
+		Page<Incident> incidents = repo.findAll(pageable);
+		return incidents;
+	}
 
-    @GetMapping("/{id}")
-    public Incident getIncident(@PathVariable Long id) {
-        return repo.findOne(id);
-    }
+	@GetMapping("/{id}")
+	public Incident getIncident(@PathVariable Long id) {
+		Incident inc = repo.findOne(id);
+		if (inc == null) {
+			throw new EntityNotFoundException("Incident not found for id : " + id);
+		}
+		return inc;
+	}
 
-    @PostMapping()
-    public Incident addIncident(@RequestBody Incident incident) {
+	@PostMapping()
+	public Incident addIncident(@RequestBody Incident incident) {
 
-        incident.setRecordTime(new Date());
-        return createOrUpdateIncident(incident);
-    }
+		incident.setRecordTime(new Date());
+		return createOrUpdateIncident(incident);
+	}
 
-    @PutMapping("/{id}")
-    public Incident updateIncident(@PathVariable Long id, @RequestBody Incident incident) {
-        if (!id.equals(incident.getId())) {
-            throw new IllegalArgumentException("Mismatched id between path variable and request body.");
-        }
-        incident.setRecordTime(new Date());
-        return createOrUpdateIncident(incident);
-    }
+	@PutMapping("/{id}")
+	public Incident updateIncident(@PathVariable Long id, @RequestBody Incident incident) {
+		if (!id.equals(incident.getId())) {
+			throw new IllegalArgumentException("Mismatched id between path variable and request body.");
+		}
+		incident.setRecordTime(new Date());
+		return createOrUpdateIncident(incident);
+	}
 
-    @DeleteMapping("/{id}")
-    @Transactional
-    public void deleteIncident(@PathVariable Long id) {
-        repo.delete(id);
-    }
+	@DeleteMapping("/{id}")
+	@Transactional
+	public void deleteIncident(@PathVariable Long id) {
+		repo.delete(id);
+	}
 
-    private Incident createOrUpdateIncident(Incident incident) {
-        incident = repo.save(incident);
-        policyExec.runOnWorker(incident.getSubject());
-        return incident;
-    }
+	private Incident createOrUpdateIncident(Incident incident) {
+		incident = repo.save(incident);
+		policyExec.runOnWorker(incident.getSubject());
+		return incident;
+	}
 }

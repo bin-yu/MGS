@@ -28,6 +28,8 @@ public class Door implements Serializable {
     private int port;
     @Column(nullable = true)
     private String label;
+    @Column(nullable = false, columnDefinition ="char(36) DEFAULT 'TEST'")
+    private String secret;
 
 
     public String getSn() {
@@ -81,5 +83,13 @@ public class Door implements Serializable {
     public void setLabel(String label) {
         this.label = label;
     }
+
+	public String getSecret() {
+		return secret;
+	}
+
+	public void setSecret(String secret) {
+		this.secret = secret;
+	}
 
 }

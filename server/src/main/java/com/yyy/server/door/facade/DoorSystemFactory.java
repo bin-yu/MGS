@@ -1,15 +1,30 @@
 package com.yyy.server.door.facade;
 
-import com.yyy.server.door.repo.Door;
+import java.util.function.Function;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
+
+import com.yyy.server.door.proxy.ProxiedTcpFC8800;
+import com.yyy.server.door.repo.Door;
+@Configuration
 public class DoorSystemFactory {
-    public static DoorSystem createInstance(Door door) {
+	@Bean
+    public Function<Door, DoorSystem> doorSysFactory() {
+        return door -> createInstance(door); // or this::thing
+    } 
+    @Bean
+    @Scope("prototype")
+    public DoorSystem createInstance(Door door) {
         if ("TCP".equalsIgnoreCase(door.getProtocol())) {
-            return new TcpFC8800(door.getSn(), door.getIp(), door.getPort());
+        	return new ProxiedTcpFC8800(door);
+            //return new TcpFC8800(door.getSn(),door.getPassword(),door.getIp(), door.getPort());
         }
         else if ("MOCK".equalsIgnoreCase(door.getProtocol())) {
             return new MockFC8800(door.getSn());
         }
         throw new IllegalArgumentException("Invalid door protocol:" + door.getProtocol());
     }
+   
 }

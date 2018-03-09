@@ -2,6 +2,8 @@ package com.yyy.server.worker.service;
 
 import java.util.List;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +51,11 @@ public class WorkerController {
 
     @GetMapping("/{id}")
     public Worker getWorker(@PathVariable Long id) {
-        return repo.findOne(id);
+        Worker worker = repo.findOne(id);
+        if(worker==null){
+        	throw new EntityNotFoundException("Worker not found for id : "+id);
+        }
+		return worker;
     }
 
     @PostMapping()
