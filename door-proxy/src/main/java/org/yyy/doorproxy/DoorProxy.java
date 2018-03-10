@@ -17,6 +17,7 @@ import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.function.Function;
 
 import javax.annotation.PostConstruct;
 import javax.net.ssl.KeyManager;
@@ -57,11 +58,11 @@ public class DoorProxy {
 
 	@Value("${proxy.doorSecrets}")
 	private String secrets;
-	
+
 	private SSLSocketFactory ssf;
-	
+
 	@Autowired
-	private TcpDoorCommandExecutor cmdExecutor;
+	private Function<String, CommandExecutor> executorFac;
 
 	@PostConstruct
 	public void prepareSocketFactory() {
@@ -73,14 +74,12 @@ public class DoorProxy {
 			KeyStore ks = loadKeystore();
 			TrustManager[] tm = getTrustManagers(ks);
 			KeyManager[] km = getKeyManagers(ks);
-			sc.init(km , tm, rand);
+			sc.init(km, tm, rand);
 			ssf = sc.getSocketFactory();
 		} catch (Throwable t) {
 			throw new RuntimeException("Failed to init door proxy!", t);
 		}
 	}
-
-	
 
 	public void start() throws InterruptedException, IOException {
 		while (true) {
@@ -93,11 +92,10 @@ public class DoorProxy {
 
 					try (BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream(), "UTF-8"))) {
 						while (true) {
-							Command cmd = null;
+							DoorRequestCommand cmd = null;
 							try {
 								cmd = receiveCommand(in);
-								logger.info("Command received : " + cmd);
-								Command respCmd = cmdExecutor.execute((DoorRequestCommand) cmd);
+								Command respCmd = executorFac.apply(cmd.getProtocol()).execute(cmd);
 								sendCommand(out, respCmd);
 							} catch (RecoverableException e) {
 								// send error response
@@ -123,9 +121,7 @@ public class DoorProxy {
 		}
 	}
 
-
-
-	private Command receiveCommand(BufferedReader in) throws RecoverableException, IOException {
+	private DoorRequestCommand receiveCommand(BufferedReader in) throws RecoverableException, IOException {
 		String msg = in.readLine();
 		logger.info("Message received : " + msg);
 		if (msg == null) {
@@ -133,7 +129,12 @@ public class DoorProxy {
 			throw new IOException("Connection is disconnected!");
 		}
 		try {
-			return Command.deserializeS(msg);
+			Command cmd = Command.deserializeS(msg);
+			logger.info("Command received : " + cmd);
+			if (!(cmd instanceof DoorRequestCommand)) {
+				throw new RecoverableException("Unexpected command type:" + cmd.getClass().getSimpleName());
+			}
+			return (DoorRequestCommand) cmd;
 		} catch (IOException e) {
 			String message = "Failed to deserialize the request command. Reason : " + e.getMessage();
 			logger.warn(message, e);
@@ -150,11 +151,14 @@ public class DoorProxy {
 			throw new RuntimeException("Failed to load the trust managers for TLS connection.", e);
 		}
 	}
-	private KeyManager[] getKeyManagers(KeyStore ks) throws UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException {
-		KeyManagerFactory kmf=KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+
+	private KeyManager[] getKeyManagers(KeyStore ks)
+			throws UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException {
+		KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
 		kmf.init(ks, ksPass.toCharArray());
 		return kmf.getKeyManagers();
 	}
+
 	private KeyStore loadKeystore() throws IOException, KeyStoreException, NoSuchAlgorithmException,
 			CertificateException, FileNotFoundException {
 		File store = new File(keyStorePath);
@@ -191,18 +195,5 @@ public class DoorProxy {
 		out.write(sendMsg);
 		out.newLine();
 		out.flush();
-	}
-
-	private static class RecoverableException extends IOException {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 8755468527353626462L;
-
-		public RecoverableException(String message) {
-			super(message);
-		}
-
 	}
 }

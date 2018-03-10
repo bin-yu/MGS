@@ -4,14 +4,11 @@ import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
-import com.yyy.proxy.common.Command;
 import com.yyy.proxy.common.client.DoorResponseCommand;
 import com.yyy.proxy.common.client.ErrorResponseCommand;
 import com.yyy.proxy.common.server.DoorRequestCommand;
 
-@Service
 public class TcpDoorCommandExecutor implements CommandExecutor {
 	private static Logger logger = LoggerFactory.getLogger(TcpDoorCommandExecutor.class);
 

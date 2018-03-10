@@ -19,8 +19,8 @@ public class ProxyTestController {
 	private DoorCommandProxy proxy;
 
 	@PostMapping("/command")
-	public Command execCommand(String ip, int port, String secret, String command)
+	public Command execCommand(String ip, int port, String secret, String protocol,String command)
 			throws UnsupportedEncodingException, DoorCommandException {
-		return proxy.sendCommand(secret, new DoorRequestCommand(ip, port, secret, command.getBytes("UTF-8")));
+		return proxy.sendCommand(secret, new DoorRequestCommand(secret, ip, port, protocol, command.getBytes("UTF-8")));
 	}
 }

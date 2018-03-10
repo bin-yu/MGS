@@ -42,8 +42,8 @@ public class ProxiedTcpFC8800 extends AbstractFC8800 {
 		try {
 			resp = null;
 			readPos = 0;
-			resp = proxy.sendCommand(door.getSecret(),
-					new DoorRequestCommand(door.getIp(), door.getPort(), door.getSecret(), request));
+			resp = proxy.sendCommand(door.getSecret(), new DoorRequestCommand(door.getSecret(), door.getIp(),
+					door.getPort(), door.getProtocol(), request));
 			if (resp instanceof ErrorResponseCommand) {
 				throw new IOException(((ErrorResponseCommand) resp).getError());
 			}

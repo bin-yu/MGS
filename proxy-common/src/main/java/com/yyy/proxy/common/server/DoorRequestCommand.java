@@ -7,7 +7,9 @@ import javax.xml.bind.DatatypeConverter;
 import com.yyy.proxy.common.Command;
 
 public class DoorRequestCommand extends Command {
+	public static final String PROTOCOL_TCP = "TCP";
 	private String doorSecret;
+	private String protocol = PROTOCOL_TCP;
 	private String doorIp;
 	private int doorPort;
 	private byte[] body;
@@ -16,17 +18,14 @@ public class DoorRequestCommand extends Command {
 		super();
 	}
 
-	
-
-	public DoorRequestCommand(String doorIp, int doorPort, String doorSecret, byte[] body) {
+	public DoorRequestCommand(String doorSecret, String doorIp, int doorPort, String protocol, byte[] body) {
 		super();
+		this.doorSecret = doorSecret;
+		this.protocol = protocol;
 		this.doorIp = doorIp;
 		this.doorPort = doorPort;
-		this.doorSecret = doorSecret;
 		this.body = body;
 	}
-
-
 
 	public byte[] getBody() {
 		return body;
@@ -36,43 +35,37 @@ public class DoorRequestCommand extends Command {
 		this.body = body;
 	}
 
-
-
 	public String getDoorSecret() {
 		return doorSecret;
 	}
-
-
 
 	public void setDoorSecret(String doorSecret) {
 		this.doorSecret = doorSecret;
 	}
 
-
-
 	public String getDoorIp() {
 		return doorIp;
 	}
-
-
 
 	public void setDoorIp(String doorIp) {
 		this.doorIp = doorIp;
 	}
 
-
-
 	public int getDoorPort() {
 		return doorPort;
 	}
-
-
 
 	public void setDoorPort(int doorPort) {
 		this.doorPort = doorPort;
 	}
 
+	public String getProtocol() {
+		return protocol;
+	}
 
+	public void setProtocol(String protocol) {
+		this.protocol = protocol;
+	}
 
 	@Override
 	public int hashCode() {
@@ -82,10 +75,9 @@ public class DoorRequestCommand extends Command {
 		result = prime * result + ((doorIp == null) ? 0 : doorIp.hashCode());
 		result = prime * result + doorPort;
 		result = prime * result + ((doorSecret == null) ? 0 : doorSecret.hashCode());
+		result = prime * result + ((protocol == null) ? 0 : protocol.hashCode());
 		return result;
 	}
-
-
 
 	@Override
 	public boolean equals(Object obj) {
@@ -110,19 +102,23 @@ public class DoorRequestCommand extends Command {
 				return false;
 		} else if (!doorSecret.equals(other.doorSecret))
 			return false;
+		if (protocol == null) {
+			if (other.protocol != null)
+				return false;
+		} else if (!protocol.equals(other.protocol))
+			return false;
 		return true;
 	}
 
-
-
 	@Override
 	public String toString() {
-		return "DoorRequestCommand [doorSecret=" + doorSecret + ", doorIp=" + doorIp + ", doorPort=" + doorPort
-				+ ", body=" + DatatypeConverter.printHexBinary(body) + "]";
+		return "DoorRequestCommand [doorSecret=" + doorSecret + ", protocol=" + protocol + ", doorIp=" + doorIp
+				+ ", doorPort=" + doorPort + ", body=" + DatatypeConverter.printHexBinary(body) + "]";
 	}
+
 	@Override
 	public String getSecret() {
 		return doorSecret;
 	}
-		
+
 }

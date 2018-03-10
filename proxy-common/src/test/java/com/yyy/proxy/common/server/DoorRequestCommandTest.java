@@ -16,7 +16,7 @@ public class DoorRequestCommandTest {
 	@Test
 	public void serializeAndDeserialize() throws IOException {
 		String hexCmd = "0FF0";
-		DoorRequestCommand cmd = new DoorRequestCommand("192.168.1.1", 8000, "AAA",
+		DoorRequestCommand cmd = new DoorRequestCommand("AAA", "192.168.1.1", 8000, "TCP",
 				DatatypeConverter.parseHexBinary(hexCmd));
 		byte[] content = cmd.serialize();
 		assertNotNull(content);
