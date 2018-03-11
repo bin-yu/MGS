@@ -1,9 +1,13 @@
 package com.yyy.server.domain.service;
 
 import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,27 +15,37 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.yyy.server.domain.repo.Domain;
 import com.yyy.server.domain.repo.DomainRepo;
+import com.yyy.server.door.service.DoorController;
+import com.yyy.server.user.repo.User;
+import com.yyy.server.user.repo.UserRepo;
 
 @RestController
 @RequestMapping({ "/domains" })
 public class DomainController {
+	private Logger logger = LoggerFactory.getLogger(DomainController.class);
 	@Autowired
 	private DomainRepo repo;
+	@Autowired
+	private UserRepo userRepo;
 
 	@GetMapping
-	public Domain getRootDomainByName(@RequestParam() String name) throws Exception {
-		if (StringUtils.isEmpty(name)) {
-			throw new IllegalArgumentException("name parameter cannot be empty!");
+	public Domain getRootDomain() throws Exception {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth == null) {
+			throw new Exception("User not authenticated!");
 		}
-		Domain domain = repo.getByName(name);
+		User thisUser = (User) auth.getPrincipal();
+		thisUser = userRepo.findOne(thisUser.getId());
+		logger.info("Current user" + thisUser);
+		Domain domain = thisUser.getDomain();
 		if (domain == null) {
-			throw new EntityNotFoundException("Domain not found : " + name);
+			throw new EntityNotFoundException("Root Domain not found for user " + thisUser.getDisplayName());
 		}
+		logger.info("Current Root Domain:" + domain.toString());
 		return domain;
 	}
 

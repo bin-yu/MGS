@@ -3,6 +3,7 @@ package com.yyy.server.workerIncident.repo;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,6 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.yyy.server.domain.repo.Domain;
 import com.yyy.server.worker.repo.Worker;
 
 @Entity
@@ -54,6 +56,9 @@ public class Incident implements Serializable{
     private String title;
     @Column(nullable = true)
     private String description;
+    @JsonIgnore
+    @ManyToOne(optional=false,cascade=CascadeType.REMOVE)
+    private Domain domain;
 
     public Category getCategory() {
         return category;
@@ -124,7 +129,13 @@ public class Incident implements Serializable{
         return id;
     }
 
-    public int calScore() {
+    
+
+	public void setDomain(Domain domain) {
+		this.domain = domain;
+	}
+
+	public int calScore() {
         return this.category.calScore(this.severity);
     }
 }

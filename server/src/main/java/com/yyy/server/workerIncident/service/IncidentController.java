@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.yyy.server.domain.repo.Domain;
+import com.yyy.server.domain.service.DomainService;
 import com.yyy.server.policy.executor.PolicyExecutor;
 import com.yyy.server.workerIncident.repo.Incident;
 import com.yyy.server.workerIncident.repo.IncidentRepo;
@@ -24,6 +26,8 @@ import com.yyy.server.workerIncident.repo.IncidentRepo;
 @RestController
 @RequestMapping({ "/incidents" })
 public class IncidentController {
+	@Autowired
+	private DomainService domainSrv;
 	@Autowired
 	private IncidentRepo repo;
 	@Autowired
@@ -33,6 +37,11 @@ public class IncidentController {
 	public Page<Incident> getIncidents(Pageable pageable) throws Exception {
 		Page<Incident> incidents = repo.findAll(pageable);
 		return incidents;
+	}
+	@GetMapping("/search")
+	public Page<Incident> searchIncidents(Long domainId, Pageable pageable) throws Exception {
+		
+		return repo.findByDomain(domainSrv.validateDomain(domainId),pageable);
 	}
 
 	@GetMapping("/{id}")

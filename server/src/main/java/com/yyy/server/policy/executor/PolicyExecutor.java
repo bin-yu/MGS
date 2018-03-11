@@ -60,7 +60,9 @@ public class PolicyExecutor {
 		executorPool = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
 			@Override
 			public Thread newThread(Runnable r) {
-				return new Thread(r, "PolicyExecutor");
+				Thread t = new Thread(r, "PolicyExecutor");
+				t.setDaemon(true);
+				return t;
 			}
 
 		});

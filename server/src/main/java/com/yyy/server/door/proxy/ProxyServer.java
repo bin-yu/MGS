@@ -73,6 +73,7 @@ public class ProxyServer {
 		serverSocket.setNeedClientAuth(true);
 		serverSocket.setEnabledProtocols(new String[]{"TLSv1.2"});
 		acceptThread = new Thread(new BIOAcceptRunnable(serverSocket),"Proxy Acceptor Thread");
+		acceptThread.setDaemon(true);
 		acceptThread.start();
 		
 		/*

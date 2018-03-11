@@ -1,10 +1,13 @@
 package com.yyy.server;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 import org.springframework.boot.autoconfigure.web.WebMvcRegistrationsAdapter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -14,6 +17,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
 
 @Configuration
 public class MvcConfiguration extends WebMvcConfigurerAdapter {
@@ -28,6 +34,15 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter {
     }
 
     @Override
+	public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+    	ObjectMapper objMapper= new ObjectMapper();
+    	objMapper.registerModule(new Hibernate5Module());
+		MappingJackson2HttpMessageConverter jackson=new MappingJackson2HttpMessageConverter(objMapper);
+		converters.add(jackson);
+		super.configureMessageConverters(converters);
+	}
+
+	@Override
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/login").setViewName("login");
     }

@@ -14,7 +14,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.yyy.server.user.repo.User;
 @Entity
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class Domain implements Serializable {
     /**
      * 
@@ -34,7 +37,20 @@ public class Domain implements Serializable {
     @OneToMany(mappedBy = "parent", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     private List<Domain> children;
 
-    public String getName() {
+    @JsonIgnore
+    @OneToMany(mappedBy = "domain", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<User> users;
+    
+    public Domain() {
+		super();
+	}
+
+	public Domain(Long id) {
+		super();
+		this.id = id;
+	}
+
+	public String getName() {
         return name;
     }
 
@@ -66,6 +82,11 @@ public class Domain implements Serializable {
     public void setParent(Domain parent) {
         this.parent = parent;
     }
+
+	@Override
+	public String toString() {
+		return "Domain [id=" + id + ", name=" + name + ", label=" + label + "]";
+	}
 
 
 }

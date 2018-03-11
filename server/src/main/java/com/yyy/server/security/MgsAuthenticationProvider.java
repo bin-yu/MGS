@@ -31,7 +31,7 @@ public class MgsAuthenticationProvider implements AuthenticationProvider {
         }
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(user.getRole().name()));
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password, authorities);
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user, password, authorities);
         authenticationToken.setDetails(authentication.getDetails());
         return authenticationToken;
     }
