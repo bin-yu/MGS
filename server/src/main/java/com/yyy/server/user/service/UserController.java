@@ -5,8 +5,6 @@ import javax.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,12 +15,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.yyy.server.domain.repo.Domain;
-import com.yyy.server.domain.service.DomainService;
 import com.yyy.server.user.repo.User;
 import com.yyy.server.user.repo.UserRepo;
 
 @RestController
-@RequestMapping({ "/{domainId}/users" })
+@RequestMapping({ "/domains/{domainId}/users" })
 public class UserController {
 	@Autowired
 	private UserRepo repo;

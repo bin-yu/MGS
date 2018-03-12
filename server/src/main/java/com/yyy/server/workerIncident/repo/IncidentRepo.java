@@ -14,4 +14,5 @@ import com.yyy.server.worker.repo.Worker;
 public interface IncidentRepo extends PagingAndSortingRepository<Incident, Long> {
     List<Incident> findBySubject(Worker subject);
     Page<Incident> findByDomain(Domain domain,Pageable pageable);
+    Incident getByIdAndDomain(Long id,Domain domain);
 }

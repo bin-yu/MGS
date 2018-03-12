@@ -16,6 +16,7 @@ import javax.persistence.OneToMany;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.yyy.server.user.repo.User;
+import com.yyy.server.workerIncident.repo.Incident;
 @Entity
 @JsonIgnoreProperties(ignoreUnknown=true)
 public class Domain implements Serializable {
@@ -40,6 +41,9 @@ public class Domain implements Serializable {
     @JsonIgnore
     @OneToMany(mappedBy = "domain", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<User> users;
+    @JsonIgnore
+    @OneToMany(mappedBy = "domain", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<Incident> incidents;
     
     public Domain() {
 		super();

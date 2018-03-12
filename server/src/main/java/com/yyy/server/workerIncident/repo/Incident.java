@@ -3,19 +3,24 @@ package com.yyy.server.workerIncident.repo;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.yyy.server.domain.repo.Domain;
 import com.yyy.server.worker.repo.Worker;
 
 @Entity
+@Table(indexes={@Index(name="idx_inc_domain_and_id",columnList="DOMAIN_ID,ID")})
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class Incident implements Serializable{
     /**
      * 
@@ -57,7 +62,7 @@ public class Incident implements Serializable{
     @Column(nullable = true)
     private String description;
     @JsonIgnore
-    @ManyToOne(optional=false,cascade=CascadeType.REMOVE)
+    @ManyToOne(optional=false,fetch = FetchType.LAZY)
     private Domain domain;
 
     public Category getCategory() {
@@ -130,6 +135,10 @@ public class Incident implements Serializable{
     }
 
     
+
+	public Domain getDomain() {
+		return domain;
+	}
 
 	public void setDomain(Domain domain) {
 		this.domain = domain;

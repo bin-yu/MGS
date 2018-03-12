@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.yyy.server.domain.repo.Domain;
 
 @Entity
-@Table(indexes={@Index(name="Idx_domain_id",columnList="DOMAIN_ID,ID")})
+@Table(indexes={@Index(name="idx_user_domain_and_id",columnList="DOMAIN_ID,ID")})
 @JsonIgnoreProperties(ignoreUnknown=true)
 public class User implements Serializable {
 	/**
