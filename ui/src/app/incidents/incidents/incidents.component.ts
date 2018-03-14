@@ -3,6 +3,7 @@ import { Incident, Pageable, IncidentService } from './../../backend/backend.mod
 import { Component, OnInit } from '@angular/core';
 import { MessageService } from '../../messages/messages.module';
 import { PageableComponent } from '../../share/share.module';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-incidents',
@@ -10,19 +11,26 @@ import { PageableComponent } from '../../share/share.module';
   styleUrls: ['./incidents.component.scss']
 })
 export class IncidentsComponent extends PageableComponent implements OnInit {
-
+  domainId: number;
   incidents: Incident[];
   selectedIncidents: Set<Incident>;
-  constructor(private router: Router, private incidentSrv: IncidentService, private msgSrv: MessageService) {
+  constructor(private route: ActivatedRoute, private router: Router, private incidentSrv: IncidentService, private msgSrv: MessageService) {
     super();
     this.selectedIncidents = new Set<Incident>();
+    route.params.subscribe(
+      val => {
+        const domainId = + val.domainId;
+        if (domainId && !isNaN(domainId)) {
+          this.domainId = domainId;
+          this.reloadItems();
+        }
+      }
+    );
   }
-
   ngOnInit() {
-    this.reloadItems();
   }
   reloadItems(): void {
-    this.incidentSrv.getIncidentsx(this.pageable).subscribe(
+    this.incidentSrv.getIncidentsx(this.domainId, this.pageable).subscribe(
       resp => {
         this.totalItems = resp.totalElements;
         this.incidents = resp.content;
@@ -41,7 +49,7 @@ export class IncidentsComponent extends PageableComponent implements OnInit {
   performDelete(): void {
     this.selectedIncidents.forEach(
       (value: Incident, value2: Incident, set: Set<Incident>) => {
-        this.incidentSrv.deleteIncident(value).subscribe(
+        this.incidentSrv.deleteIncident(this.domainId, value).subscribe(
           _ => {
             console.log('incident deleted: ' + value.id);
             this.msgSrv.addSuccess('事件删除成功：' + value.id);

@@ -12,8 +12,8 @@ export class UserService {
   /* getUsers(): Observable<User[]> {
     return this.backend.list<User>('/users');
   } */
-  getUsersx(pageable: Pageable): Observable<PagedResp<User>> {
-    return this.backend.listx<User>('/users', pageable).pipe(
+  getUsersx(domainId: number, pageable: Pageable): Observable<PagedResp<User>> {
+    return this.backend.listx<User>('/domains/' + domainId + '/users', pageable).pipe(
       map(resp => {
         const users = [];
         resp.content.forEach(p => { users.push(User.clone(p)); });
@@ -22,8 +22,8 @@ export class UserService {
       })
     );
   }
-  findUsersx(nameLike: string, pageable: Pageable): Observable<PagedResp<User>> {
-    return this.backend.getx<PagedResp<User>>('/users/search', {
+  findUsersx(domainId: number, nameLike: string, pageable: Pageable): Observable<PagedResp<User>> {
+    return this.backend.getx<PagedResp<User>>('/domains/' + domainId + '/users/search', {
       params: {
         nameLike: '%' + nameLike + '%',
         page: '' + pageable.page,
@@ -39,23 +39,23 @@ export class UserService {
       })
     );
   }
-  getUser(id: Number): Observable<User> {
-    return this.backend.get<User>('/users/' + id).pipe(
+  getUser(domainId: number, id: Number): Observable<User> {
+    return this.backend.get<User>('/domains/' + domainId + '/users/' + id).pipe(
       map(user => User.clone(user))
     );
   }
-  addUser(user: User): Observable<User> {
-    return this.backend.post<User, User>('/users', user).pipe(
+  addUser(domainId: number, user: User): Observable<User> {
+    return this.backend.post<User, User>('/domains/' + domainId + '/users', user).pipe(
       map(u => User.clone(u))
     );
   }
-  updateUser(user: User): Observable<User> {
-    return this.backend.put<User>('/users/' + user.id, user).pipe(
+  updateUser(domainId: number, user: User): Observable<User> {
+    return this.backend.put<User>('/domains/' + domainId + '/users/' + user.id, user).pipe(
       map(u => User.clone(u))
     );
   }
-  deleteUser(user: User): Observable<void> {
-    return this.backend.delete<void>('/users/' + user.id);
+  deleteUser(domainId: number, user: User): Observable<void> {
+    return this.backend.delete<void>('/domains/' + domainId + '/users/' + user.id);
   }
 
   logout(): Observable<void> {

@@ -66,6 +66,15 @@ public class DomainController {
 		return repo.save(domain);
 	}
 
+	@GetMapping("/{id}")
+	public Domain getDomain(@PathVariable Long id) {
+		Domain domain = repo.findOne(id);
+		if (domain == null) {
+			throw new IllegalArgumentException("domain id not found!");
+		}
+		return domain;
+	}
+
 	@PutMapping("/{id}")
 	public Domain updateDomain(@PathVariable Long id, @RequestBody Domain domain) {
 		Domain db = repo.findOne(id);

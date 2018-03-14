@@ -15,10 +15,12 @@ import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.yyy.server.card.repo.Card;
 import com.yyy.server.workerIncident.repo.Incident;
 import com.yyy.server.workerIncident.repo.Incident.Category;
 @Entity
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class Worker implements Serializable {
     private static final long serialVersionUID = -8743126316266346607L;
 

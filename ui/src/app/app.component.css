@@ -1,3 +1,6 @@
 .content-wrapper {
     display:flex;
 }
+footer.sticky-footer {
+    position: fixed;
+}

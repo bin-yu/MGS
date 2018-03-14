@@ -1,7 +1,7 @@
 import { MessageService } from './../../messages/message.service';
 import { UserService, User } from './../../backend/backend.module';
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { PageableComponent } from '../../share/share.module';
 @Component({
   selector: 'app-users',
@@ -9,30 +9,38 @@ import { PageableComponent } from '../../share/share.module';
   styleUrls: ['./users.component.scss']
 })
 export class UsersComponent extends PageableComponent implements OnInit {
-
+  domainId: number;
   users: User[];
   selectedUsers: Set<User>;
 
   searchStr: string;
 
-  constructor(private router: Router, private userSrv: UserService, private msgSrv: MessageService) {
+  constructor(private route: ActivatedRoute, private router: Router, private userSrv: UserService, private msgSrv: MessageService) {
     super();
     this.selectedUsers = new Set<User>();
+    route.params.subscribe(
+      val => {
+        const domainId = + val.domainId;
+        if (domainId && !isNaN(domainId)) {
+          this.domainId = domainId;
+          this.reloadItems();
+        }
+      }
+    );
   }
 
   ngOnInit() {
-    this.reloadItems();
   }
   reloadItems(): void {
     if (this.searchStr && this.searchStr.length > 0) {
-      this.userSrv.findUsersx(this.searchStr, this.pageable).subscribe(
+      this.userSrv.findUsersx(this.domainId, this.searchStr, this.pageable).subscribe(
         resp => {
           this.totalItems = resp.totalElements;
           this.users = resp.content;
         }
       );
     } else {
-      this.userSrv.getUsersx(this.pageable).toPromise().then(
+      this.userSrv.getUsersx(this.domainId, this.pageable).toPromise().then(
         resp => {
           this.totalItems = resp.totalElements;
           this.users = resp.content;
@@ -51,7 +59,7 @@ export class UsersComponent extends PageableComponent implements OnInit {
   performDelete(): void {
     this.selectedUsers.forEach(
       (value: User, value2: User, set: Set<User>) => {
-        this.userSrv.deleteUser(value).subscribe(
+        this.userSrv.deleteUser(this.domainId, value).subscribe(
           _ => {
             console.log('user deleted: ' + value.id);
             this.msgSrv.addSuccess('用户删除成功：' + value.id);

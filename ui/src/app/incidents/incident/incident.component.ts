@@ -71,6 +71,7 @@ export class IncidentComponent implements OnInit {
   isAdd: boolean;
   incident: Incident;
   maxDate: any;
+  domainId: number;
   constructor(private route: ActivatedRoute, private _location: Location, private incidentSrv: IncidentService) {
     this.incident = new Incident();
     this.incident.category = 'BLACK';
@@ -86,13 +87,14 @@ export class IncidentComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.domainId = +this.route.snapshot.paramMap.get('domainId');
     const id = +this.route.snapshot.paramMap.get('id');
     if (Number.isNaN(id)) {
       this.isAdd = true;
       return;
     }
     this.isAdd = false;
-    this.incidentSrv.getIncident(id).subscribe(
+    this.incidentSrv.getIncident(this.domainId, id).subscribe(
       incident => {
         this.incident = incident;
       }
@@ -101,14 +103,14 @@ export class IncidentComponent implements OnInit {
 
   onSubmit(): void {
     if (this.isAdd) {
-      this.incidentSrv.addIncident(this.incident).subscribe(
+      this.incidentSrv.addIncident(this.domainId, this.incident).subscribe(
         incident => {
           this._location.back();
         }
       );
     } else {
       // update incident
-      this.incidentSrv.updateIncident(this.incident).subscribe(
+      this.incidentSrv.updateIncident(this.domainId, this.incident).subscribe(
         incident => {
           this._location.back();
         }

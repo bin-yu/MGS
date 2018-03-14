@@ -49,7 +49,7 @@ export class DoorTree2Component implements AfterViewInit, OnInit {
 
   }
   onActivate(event: any): void {
-    const item: any = this.tree.getItem(event.args.element);
+    const item: any = this.tree.getSelectedItem();
     if (item.level === 0) {
       if (item.isExpanded) {
         this.tree.collapseItem(item);

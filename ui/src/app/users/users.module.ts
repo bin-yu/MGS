@@ -16,7 +16,11 @@ const PolRoutes: Routes = [
         path: '',
         component: UsersComponent
       },
-      { path: ':id', component: UserComponent }
+      {
+        path: ':domainId',
+        component: UsersComponent
+      },
+      { path: ':domainId/:id', component: UserComponent }
     ]
   }
 ];

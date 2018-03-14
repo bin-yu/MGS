@@ -9,23 +9,23 @@ import { PagedResp } from '../paged-resp';
 export class IncidentService {
 
   constructor(private backend: BackendService) { }
-  getIncidents(): Observable<Incident[]> {
-    return this.backend.list<Incident>('/incidents');
+  getIncidents(domainId: number): Observable<Incident[]> {
+    return this.backend.list<Incident>('/domains/' + domainId + '/incidents');
   }
-  getIncidentsx(pageable: Pageable): Observable<PagedResp<Incident>> {
-    return this.backend.listx<Incident>('/incidents', pageable);
+  getIncidentsx(domainId: number, pageable: Pageable): Observable<PagedResp<Incident>> {
+    return this.backend.listx<Incident>('/domains/' + domainId + '/incidents', pageable);
   }
-  getIncident(id: Number): Observable<Incident> {
-    return this.backend.get<Incident>('/incidents/' + id);
+  getIncident(domainId: number, id: Number): Observable<Incident> {
+    return this.backend.get<Incident>('/domains/' + domainId + '/incidents/' + id);
   }
-  addIncident(incident: Incident): Observable<Incident> {
-    return this.backend.post<Incident, Incident>('/incidents', incident);
+  addIncident(domainId: number, incident: Incident): Observable<Incident> {
+    return this.backend.post<Incident, Incident>('/domains/' + domainId + '/incidents', incident);
   }
-  updateIncident(incident: Incident): Observable<Incident> {
-    return this.backend.put<Incident>('/incidents/' + incident.id, incident);
+  updateIncident(domainId: number, incident: Incident): Observable<Incident> {
+    return this.backend.put<Incident>('/domains/' + domainId + '/incidents/' + incident.id, incident);
   }
-  deleteIncident(incident: Incident): Observable<void> {
-    return this.backend.delete<void>('/incidents/' + incident.id);
+  deleteIncident(domainId: number, incident: Incident): Observable<void> {
+    return this.backend.delete<void>('/domains/' + domainId + '/incidents/' + incident.id);
   }
 
 }

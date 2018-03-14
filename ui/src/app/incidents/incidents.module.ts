@@ -9,7 +9,6 @@ import { FormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ShareModule } from '../share/share.module';
 
-
 export { IncidentsComponent } from './incidents/incidents.component';
 export { Policy, Action } from '../backend/policy/policy';
 export { Condition } from '../backend/policy/condition';
@@ -23,7 +22,11 @@ const IncRoutes: Routes = [
         path: '',
         component: IncidentsComponent
       },
-      { path: ':id', component: IncidentComponent }
+      {
+        path: ':domainId',
+        component: IncidentsComponent
+      },
+      { path: ':domainId/:id', component: IncidentComponent }
     ]
   }
 ];
@@ -39,7 +42,8 @@ const IncRoutes: Routes = [
   exports: [
     RouterModule
   ],
-  declarations: [IncidentsMainComponent, IncidentsComponent, IncidentComponent],
+  declarations: [
+    IncidentsMainComponent, IncidentsComponent, IncidentComponent],
   providers: []
 })
 export class IncidentsModule { }

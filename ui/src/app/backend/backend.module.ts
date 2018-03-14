@@ -6,6 +6,7 @@ import { BackendService } from './backend.service';
 import { IncidentService } from './incident/incident.service';
 import { PolicyService } from './policy/policy.service';
 import { UserService } from './user/user.service';
+import { DomainService } from './domain/domain.service';
 
 
 
@@ -25,12 +26,14 @@ export { Policy, Action } from './policy/policy';
 export { Condition, PropertyName, Comparator } from './policy/condition';
 export { UserService } from './user/user.service';
 export { User, Role } from './user/user';
+export { DomainService } from './domain/domain.service';
+export { Domain } from './domain/domain';
 @NgModule({
   imports: [
     CommonModule,
   ],
   declarations: [],
   providers: [
-    WorkerService, DoorService, BackendService, IncidentService, PolicyService, UserService]
+    WorkerService, DoorService, BackendService, IncidentService, PolicyService, UserService, DomainService]
 })
 export class BackendModule { }
