@@ -95,7 +95,7 @@ export class DoorsComponent extends PageableComponent implements OnInit {
     const cardNo = +prompt('请输入卡号：', '1');
     this.selectedDoors.forEach(
       (value: Door, value2: Door, set: Set<Door>) => {
-        this.doorSrv.delCard(value.id, cardNo).subscribe(
+        this.doorSrv.delCard(this.domainId, value.id, cardNo).subscribe(
           _ => {
             console.log('door ' + value.sn + ': card deleted: ' + cardNo);
             this.msgSrv.addSuccess('门禁 ' + value.sn + ': 卡已删除 ：' + cardNo);

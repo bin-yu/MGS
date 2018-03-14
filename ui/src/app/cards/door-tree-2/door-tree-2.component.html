@@ -1,4 +1,7 @@
-
-  <jqxTree #treeReference
-           [width]="'100%'" [height]="'98%'" [(source)]="treeSource" (onSelect)="onActivate($event)">
+<div class="doorTreeTitle">
+  <p>请选择门禁系统：</p>
+</div>
+<div class="doorTree">
+  <jqxTree #treeReference [width]="'100%'" [height]="'100%'" [(source)]="treeSource" (onSelect)="onActivate($event)">
   </jqxTree>
+</div>

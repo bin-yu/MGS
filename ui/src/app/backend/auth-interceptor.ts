@@ -21,6 +21,9 @@ export class AuthInterceptor implements HttpInterceptor {
         Observable<HttpEvent<any>> {
         const rt = next.handle(req);
         return rt.pipe(
+            tap(
+                resp => console.log(req.method + ':' + req.url + ', resp:' + JSON.stringify(resp))
+            ),
             catchError(this.handleError<any>(req.url, null))
         );
     }

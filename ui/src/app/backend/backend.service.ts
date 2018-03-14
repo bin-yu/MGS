@@ -16,10 +16,7 @@ export class BackendService {
   list<T>(url: string): Observable<T[]> {
     return this.http.get<PagedResp<T>>(environment.apibaseurl + url).pipe(
       map(
-        resp => {
-          console.log('httplist, resp:' + JSON.stringify(resp));
-          return resp.content;
-        }
+        resp =>  resp.content
       ),
       catchError(this.handleError<T[]>('httplist', []))
     );

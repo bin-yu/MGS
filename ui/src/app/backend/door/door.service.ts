@@ -14,8 +14,8 @@ import { PagedResp } from '../paged-resp';
 export class DoorService {
 
   constructor(private backend: BackendService) { }
-  getDoors(): Observable<Door[]> {
-    return this.backend.list<Door>('/doors');
+  getDoors(domainId: number): Observable<Door[]> {
+    return this.backend.list<Door>('/domains/' + domainId + '/doors');
   }
   getDoorsx(domainId: number, pageable: Pageable): Observable<PagedResp<Door>> {
     return this.backend.listx<Door>('/domains/' + domainId + '/doors', pageable);
@@ -50,18 +50,18 @@ export class DoorService {
     return this.backend.get<CardData>('/domains/' + domainId + '/doors/' + door.id + '/cards/' + cardNo + '/cardData');
   }
 
-  getCards(doorId: number): Observable<Card[]> {
-    return this.backend.list<Card>('/doors/' + doorId + '/cards');
+  getCards(domainId: number, doorId: number): Observable<Card[]> {
+    return this.backend.list<Card>('/domains/' + domainId + '/doors/' + doorId + '/cards');
   }
-  getCardsx(doorId: number, pageable: Pageable): Observable<PagedResp<Card>> {
-    return this.backend.listx<Card>('/doors/' + doorId + '/cards', pageable);
+  getCardsx(domainId: number, doorId: number, pageable: Pageable): Observable<PagedResp<Card>> {
+    return this.backend.listx<Card>('/domains/' + domainId + '/doors/' + doorId + '/cards', pageable);
   }
-  getCard(doorId: number, cardNo: number): Observable<Card> {
-    return this.backend.get<Card>('/doors/' + doorId + '/cards/' + cardNo);
+  getCard(domainId: number, doorId: number, cardNo: number): Observable<Card> {
+    return this.backend.get<Card>('/domains/' + domainId + '/doors/' + doorId + '/cards/' + cardNo);
   }
 
-  addCard(doorId: number, card: Card, isUpload: boolean): Observable<Card> {
-    return this.backend.postx<void>('/doors/' + doorId + '/cards', null, {
+  addCard(domainId: number, doorId: number, card: Card, isUpload: boolean): Observable<Card> {
+    return this.backend.postx<void>('/domains/' + domainId + '/doors/' + doorId + '/cards', null, {
       params: {
         cid: card.cardNo,
         workerId: card.worker.id,
@@ -69,7 +69,7 @@ export class DoorService {
       }
     });
   }
-  delCard(doorId: number, cardNo: number): Observable<void> {
-    return this.backend.delete<void>('/doors/' + doorId + '/cards/' + cardNo);
+  delCard(domainId: number, doorId: number, cardNo: number): Observable<void> {
+    return this.backend.delete<void>('/domains/' + domainId + '/doors/' + doorId + '/cards/' + cardNo);
   }
 }

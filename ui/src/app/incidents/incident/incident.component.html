@@ -54,7 +54,7 @@
   <div class="form-group row">
     <label for="subject" class="col-lg-2 col-form-label">涉及民工</label>
     <div class="col-lg-10">
-        <app-worker-input [(selected)]="incident.subject"></app-worker-input>
+        <app-worker-input [domainId]="domainId" [(selected)]="incident.subject"></app-worker-input>
     </div>
   </div>
   <div class="form-group row">

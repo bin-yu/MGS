@@ -21,10 +21,14 @@ const CardRoutes: Routes = [
         component: CardsComponent
       },
       {
-        path: ':doorId',
+        path: ':domainId',
         component: CardsComponent
       },
-      { path: ':doorId/:cardNo', component: CardComponent }
+      {
+        path: ':domainId/:doorId',
+        component: CardsComponent
+      },
+      { path: ':domainId/:doorId/:cardNo', component: CardComponent }
     ]
   }
 ];

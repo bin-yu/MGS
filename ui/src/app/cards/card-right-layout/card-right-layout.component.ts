@@ -8,6 +8,8 @@ import { Door } from '../../backend/backend.module';
   styleUrls: ['./card-right-layout.component.scss']
 })
 export class CardRightLayoutComponent implements OnInit {
+  @Input()
+  domainId: number;
 
   constructor(private route: ActivatedRoute, private router: Router) { }
 
@@ -15,14 +17,9 @@ export class CardRightLayoutComponent implements OnInit {
   }
 
   @Input()
-  set door(door: Door) {
-    if (door) {
-      let url: string;
-      url = './';
-      if (door) {
-        url += door.id;
-      }
-      this.router.navigate([url], { relativeTo: this.route });
+  set door(doorId: number) {
+    if (doorId) {
+      this.router.navigate(['./' + this.domainId + '/' + doorId], { relativeTo: this.route });
     }
   }
 }

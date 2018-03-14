@@ -10,6 +10,7 @@ import { PageableComponent } from '../../share/share.module';
   styleUrls: ['./cards.component.scss']
 })
 export class CardsComponent extends PageableComponent implements OnInit {
+  domainId: number;
   doorId: number;
   cards: Card[];
   selectedCards: Set<Card>;
@@ -21,25 +22,25 @@ export class CardsComponent extends PageableComponent implements OnInit {
     this.selectedCards = new Set<Card>();
     route.params.subscribe(
       val => {
-        this.doorId = + val.doorId;
+        const doorId = + val.doorId;
+        if (doorId && !isNaN(doorId)) {
+          this.doorId = doorId;
+        }
+        const domainId = + val.domainId;
+        if (domainId && !isNaN(domainId)) {
+          this.domainId = domainId;
+        }
         this.reloadItems();
       }
     );
   }
- /*  @Input()
-  set door(door: Door) {
-    this._door = door;
-    this.reloadCards();
-  }
-  get door(): Door { return this._door; } */
-
   ngOnInit() {
   }
   reloadItems(): void {
     this.cards = [];
     this.selectedCards.clear();
-    if (! Number.isNaN(this.doorId)) {
-      this.doorSrv.getCardsx(this.doorId, this.pageable).subscribe(
+    if (!isNaN(this.doorId) && !isNaN(this.domainId)) {
+      this.doorSrv.getCardsx(this.domainId, this.doorId, this.pageable).subscribe(
         resp => {
           this.totalItems = resp.totalElements;
           this.cards = resp.content;
@@ -58,7 +59,7 @@ export class CardsComponent extends PageableComponent implements OnInit {
   performDelete(): void {
     this.selectedCards.forEach(
       (value: Card, value2: Card, set: Set<Card>) => {
-        this.doorSrv.delCard(this.doorId, value.cardNo).subscribe(
+        this.doorSrv.delCard(this.domainId, this.doorId, value.cardNo).subscribe(
           _ => {
             console.log('card deleted: ' + value.cardNo);
             this.msgSrv.addSuccess('卡片删除成功：' + value.cardNo);

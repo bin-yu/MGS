@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs/Observable';
 
-import {of} from 'rxjs/observable/of';
+import { of } from 'rxjs/observable/of';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/operator/distinctUntilChanged';
@@ -22,14 +22,16 @@ import { Location } from '@angular/common';
   styleUrls: ['./card.component.scss']
 })
 export class CardComponent implements OnInit {
+  domainId: number;
   card: Card;
   isAdd: boolean;
   isUpload = false;
-  constructor(private route: ActivatedRoute, private _location: Location, private doorSrv: DoorService, private workerSrv:WorkerService) {
+  constructor(private route: ActivatedRoute, private _location: Location, private doorSrv: DoorService, private workerSrv: WorkerService) {
     this.card = new Card();
   }
 
   ngOnInit() {
+    this.domainId = +this.route.snapshot.paramMap.get('domainId');
     this.card.doorId = +this.route.snapshot.paramMap.get('doorId');
     const id = +this.route.snapshot.paramMap.get('cardNo');
     if (Number.isNaN(id)) {
@@ -37,7 +39,7 @@ export class CardComponent implements OnInit {
       return;
     }
     this.isAdd = false;
-    this.doorSrv.getCard(this.card.doorId, id).subscribe(
+    this.doorSrv.getCard(this.domainId, this.card.doorId, id).subscribe(
       card => {
         this.card = card;
       }
@@ -46,7 +48,7 @@ export class CardComponent implements OnInit {
 
   onSubmit(): void {
     if (this.isAdd) {
-      this.doorSrv.addCard(this.card.doorId, this.card, this.isUpload).subscribe(
+      this.doorSrv.addCard(this.domainId, this.card.doorId, this.card, this.isUpload).subscribe(
         card => {
           this._location.back();
         }

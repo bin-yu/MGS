@@ -24,12 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.yyy.server.card.repo.Card;
 import com.yyy.server.card.repo.Card.CardKey;
-import com.yyy.server.domain.repo.Domain;
 import com.yyy.server.card.repo.CardRepo;
+import com.yyy.server.domain.repo.Domain;
 import com.yyy.server.door.facade.CardAreaStatus;
 import com.yyy.server.door.facade.CardData;
 import com.yyy.server.door.facade.DoorSystem;
-import com.yyy.server.door.facade.DoorSystemFactory;
 import com.yyy.server.door.repo.Door;
 import com.yyy.server.door.repo.DoorRepo;
 import com.yyy.server.worker.repo.Worker;
@@ -98,7 +97,8 @@ public class DoorController {
 	@GetMapping("/{did}/cards")
 	public Page<Card> getCards(@PathVariable Long domainId, @PathVariable Long did, Pageable pageable)
 			throws IOException {
-		return cardRepo.findByDoorId(did, pageable);
+		Door door = this.getDoor(domainId, did);
+		return cardRepo.findByDoorId(door.getId(), pageable);
 	}
 
 	@GetMapping("/{did}/cards/{cid}/cardData")
@@ -111,7 +111,8 @@ public class DoorController {
 	@GetMapping("/{did}/cards/{cid}")
 	public Card getCard(@PathVariable Long domainId, @PathVariable Long did, @PathVariable Long cid)
 			throws IOException {
-		Card card = cardRepo.findOne(new CardKey(did, cid));
+		Door door = this.getDoor(domainId, did);
+		Card card = cardRepo.findOne(new CardKey(door.getId(), cid));
 		if (card == null) {
 			throw new EntityNotFoundException("Card not found for (door=" + did + ",card=" + cid + ")");
 		}
@@ -148,13 +149,13 @@ public class DoorController {
 	@Transactional
 	public void delCard(@PathVariable Long domainId, @PathVariable Long did, @PathVariable Long cid,
 			@RequestParam(required = false, defaultValue = "true") boolean upload) throws IOException {
-		CardKey key = new CardKey(did, cid);
-		cardRepo.delete(key);
-		logger.info("Card deleted:" + key);
+		Card card = this.getCard(domainId, did, cid);
+		cardRepo.delete(card);
+		logger.info("Card deleted:" + card);
 		if (upload) {
 			DoorSystem doorSys = getDoorSystem(domainId, did);
 			doorSys.deleteCard(new long[] { cid });
-			logger.info("Card deleted from door system :" + key);
+			logger.info("Card deleted from door system :" + card);
 		}
 	}
 

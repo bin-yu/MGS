@@ -18,6 +18,7 @@ import { Worker, WorkerService } from '../../backend/backend.module';
   styleUrls: ['./worker-input.component.scss']
 })
 export class WorkerInputComponent implements OnInit {
+  @Input()
   domainId: number;
   _worker: Worker;
   @Output() selectedChange = new EventEmitter();
