@@ -1,4 +1,4 @@
-import { ScoresMainComponent } from './scores.main.component';
+import { ScoresMainComponent } from './scores-main/scores.main.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
@@ -12,6 +12,10 @@ const ScoreRoutes: Routes = [
     children: [
       {
         path: '',
+        component: ScoresComponent
+      },
+      {
+        path: ':domainId',
         component: ScoresComponent
       }
     ]

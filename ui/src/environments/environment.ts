@@ -5,5 +5,6 @@
 
 export const environment = {
   production: false,
-  apibaseurl: 'http://localhost:8080/api'
+  apibaseurl: 'http://localhost:8080/api',
+  domainRootUrl: '/domains/1'
 };

@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
 import { DoorTree2Component } from './door-tree-2/door-tree-2.component';
 import { jqxTreeComponent } from 'jqwidgets-scripts/jqwidgets-ts/angular_jqxtree';
+import { jqxMenuComponent } from 'jqwidgets-scripts/jqwidgets-ts/angular_jqxmenu';
 
 const CardRoutes: Routes = [
   {
@@ -40,7 +41,7 @@ const CardRoutes: Routes = [
     ShareModule,
     NgbTypeaheadModule
   ],
-  declarations: [jqxTreeComponent,
+  declarations: [jqxTreeComponent, jqxMenuComponent,
     CardsComponent, CardsLayoutComponent, CardComponent, CardRightLayoutComponent, DoorTree2Component]
 })
 export class CardsModule { }

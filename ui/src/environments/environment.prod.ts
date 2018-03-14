@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  apibaseurl: '/api'
+  apibaseurl: '/api',
+  domainRootUrl: '/domains'
 };

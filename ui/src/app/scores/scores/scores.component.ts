@@ -1,3 +1,4 @@
+import { ActivatedRoute } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 import { Worker, WorkerService } from '../../backend/backend.module';
 import { PageableComponent } from '../../share/share.module';
@@ -8,16 +9,24 @@ import { PageableComponent } from '../../share/share.module';
   styleUrls: ['./scores.component.scss']
 })
 export class ScoresComponent extends PageableComponent implements OnInit {
-  domainId:number;
+  domainId: number;
   workers: Worker[];
 
   searchStr: string;
-  constructor(private workerSrv: WorkerService) {
+  constructor(private route: ActivatedRoute, private workerSrv: WorkerService) {
     super();
+    route.params.subscribe(
+      val => {
+        const domainId = + val.domainId;
+        if (domainId && !isNaN(domainId)) {
+          this.domainId = domainId;
+          this.reloadItems();
+        }
+      }
+    );
   }
 
   ngOnInit() {
-    this.reloadItems();
   }
   reloadItems(): void {
     if (this.searchStr && this.searchStr.length > 0) {

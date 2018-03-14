@@ -1,8 +1,6 @@
 import { environment } from './../../../environments/environment';
 import { DomainService, Domain } from './../../backend/backend.module';
 import { Component, OnInit, ViewChild, AfterViewInit, Input, Output, EventEmitter } from '@angular/core';
-import { jqxTreeComponent } from 'jqwidgets-scripts/jqwidgets-ts/angular_jqxtree';
-import { jqxMenuComponent } from 'jqwidgets-scripts/jqwidgets-ts/angular_jqxmenu';
 import { jqxTreeGridComponent } from 'jqwidgets-scripts/jqwidgets-ts/angular_jqxtreegrid';
 
 const ICON_FOLDER = '/assets/img/folder-icon.png';
@@ -33,7 +31,7 @@ export class DomainTreeComponent implements OnInit {
         },
       id: 'id',
       // localData: this.domains,
-      url: environment.apibaseurl + '/domains/1',
+      url: environment.apibaseurl + environment.domainRootUrl,
       addRow: (rowID, rowData, position, parentID, commit) => {
         // synchronize with the server - send insert command
         // call commit with parameter true if the synchronization with the server is successful 
