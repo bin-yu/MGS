@@ -1,13 +1,27 @@
 package com.yyy.server.door.repo;
 
 import java.io.Serializable;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.yyy.server.card.repo.Card;
+import com.yyy.server.domain.repo.Domain;
 
 @Entity
+@Table(indexes={@Index(name="idx_door_domain_and_id",columnList="DOMAIN_ID,ID")})
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class Door implements Serializable {
     /**
      * 
@@ -30,7 +44,13 @@ public class Door implements Serializable {
     private String label;
     @Column(nullable = false, columnDefinition ="char(36) DEFAULT 'TEST'")
     private String secret;
-
+    @JsonIgnore()
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	private Domain domain;
+    
+    @JsonIgnore
+    @OneToMany(mappedBy = "doorId", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<Card> cards;
 
     public String getSn() {
         return sn;
@@ -92,4 +112,11 @@ public class Door implements Serializable {
 		this.secret = secret;
 	}
 
+	public void setDomain(Domain domain) {
+		this.domain = domain;
+	}
+
+	public Domain getDomain() {
+		return domain;
+	}
 }

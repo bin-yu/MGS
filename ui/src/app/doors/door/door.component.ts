@@ -10,7 +10,7 @@ import { DoorService, Door } from './../../backend/backend.module';
   styleUrls: ['./door.component.scss']
 })
 export class DoorComponent implements OnInit {
-
+  domainId: number;
   isAdd: boolean;
   door: Door;
   constructor(private route: ActivatedRoute, private _location: Location, private doorSrv: DoorService) {
@@ -21,13 +21,14 @@ export class DoorComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.domainId = +this.route.snapshot.paramMap.get('domainId');
     const id = +this.route.snapshot.paramMap.get('id');
     if (Number.isNaN(id)) {
       this.isAdd = true;
       return;
     }
     this.isAdd = false;
-    this.doorSrv.getDoor(id).subscribe(
+    this.doorSrv.getDoor(this.domainId, id).subscribe(
       door => {
         this.door = door;
       }
@@ -36,14 +37,14 @@ export class DoorComponent implements OnInit {
 
   onSubmit(): void {
     if (this.isAdd) {
-      this.doorSrv.addDoor(this.door).subscribe(
+      this.doorSrv.addDoor(this.domainId, this.door).subscribe(
         door => {
           this._location.back();
         }
       );
     } else {
       // update door
-      this.doorSrv.updateDoor(this.door).subscribe(
+      this.doorSrv.updateDoor(this.domainId, this.door).subscribe(
         door => {
           this._location.back();
         }

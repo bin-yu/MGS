@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.yyy.server.card.repo.Card;
 import com.yyy.server.card.repo.Card.CardKey;
+import com.yyy.server.domain.repo.Domain;
 import com.yyy.server.card.repo.CardRepo;
 import com.yyy.server.door.facade.CardAreaStatus;
 import com.yyy.server.door.facade.CardData;
@@ -35,7 +36,7 @@ import com.yyy.server.worker.repo.Worker;
 import com.yyy.server.worker.repo.WorkerRepo;
 
 @RestController
-@RequestMapping({ "/doors" })
+@RequestMapping({ "/domains/{domainId}/doors" })
 public class DoorController {
 	private Logger logger = LoggerFactory.getLogger(DoorController.class);
 	@Autowired
@@ -48,15 +49,13 @@ public class DoorController {
 	private Function<Door, DoorSystem> doorSysFactory;
 
 	@GetMapping
-	public Page<Door> getDoors(Pageable pageable) throws Exception {
-		Page<Door> doors = repo.findAll(pageable);
-		logger.info("getDoors: returned Door count:" + doors.getNumberOfElements());
-		return doors;
+	public Page<Door> getDoors(@PathVariable Long domainId, Pageable pageable) throws Exception {
+		return repo.findByDomain(new Domain(domainId), pageable);
 	}
 
 	@GetMapping("/{id}")
-	public Door getDoor(@PathVariable Long id) {
-		Door door = repo.findOne(id);
+	public Door getDoor(@PathVariable Long domainId, @PathVariable Long id) {
+		Door door = repo.getByIdAndDomain(id, new Domain(domainId));
 		if (door == null) {
 			throw new EntityNotFoundException("Door not found for id : " + id);
 		}
@@ -64,49 +63,54 @@ public class DoorController {
 	}
 
 	@PostMapping()
-	public Door addDoor(@RequestBody Door door) {
+	public Door addDoor(@PathVariable Long domainId, @RequestBody Door door) {
 		door.setSecret(UUID.randomUUID().toString());
+		door.setDomain(new Domain(domainId));
 		return repo.save(door);
 	}
 
 	@PutMapping("/{id}")
-	public Door updateDoor(@PathVariable Long id, @RequestBody Door Door) {
-		if (!id.equals(Door.getId())) {
+	public Door updateDoor(@PathVariable Long domainId, @PathVariable Long id, @RequestBody Door door) {
+		if (!id.equals(door.getId())) {
 			throw new IllegalArgumentException("Mismatched id between path variable and request body.");
 		}
-		return repo.save(Door);
+		door.setDomain(new Domain(domainId));
+		return repo.save(door);
 	}
 
 	@DeleteMapping("/{id}")
-	public void deleteDoor(@PathVariable Long id) {
-		repo.delete(id);
+	public void deleteDoor(@PathVariable Long domainId, @PathVariable Long id) {
+		repo.delete(this.getDoor(domainId, id));
 	}
 
 	@GetMapping("/{id}/version")
-	public Version getVersion(@PathVariable Long id) throws IOException {
-		DoorSystem doorSys = getDoorSystem(id);
+	public Version getVersion(@PathVariable Long domainId, @PathVariable Long id) throws IOException {
+		DoorSystem doorSys = getDoorSystem(domainId, id);
 		return new Version(doorSys.getVersion());
 	}
 
 	@GetMapping("/{id}/cardAreaStatus")
-	public CardAreaStatus getCardAreaStatus(@PathVariable Long id) throws IOException {
-		DoorSystem doorSys = getDoorSystem(id);
+	public CardAreaStatus getCardAreaStatus(@PathVariable Long domainId, @PathVariable Long id) throws IOException {
+		DoorSystem doorSys = getDoorSystem(domainId, id);
 		return doorSys.readCardAreaStatus();
 	}
 
 	@GetMapping("/{did}/cards")
-	public Page<Card> getCards(@PathVariable Long did, Pageable pageable) throws IOException {
+	public Page<Card> getCards(@PathVariable Long domainId, @PathVariable Long did, Pageable pageable)
+			throws IOException {
 		return cardRepo.findByDoorId(did, pageable);
 	}
 
 	@GetMapping("/{did}/cards/{cid}/cardData")
-	public CardData readCard(@PathVariable Long did, @PathVariable Long cid) throws IOException {
-		DoorSystem doorSys = getDoorSystem(did);
+	public CardData readCard(@PathVariable Long domainId, @PathVariable Long did, @PathVariable Long cid)
+			throws IOException {
+		DoorSystem doorSys = getDoorSystem(domainId, did);
 		return doorSys.readCardData(cid);
 	}
 
 	@GetMapping("/{did}/cards/{cid}")
-	public Card getCard(@PathVariable Long did, @PathVariable Long cid) throws IOException {
+	public Card getCard(@PathVariable Long domainId, @PathVariable Long did, @PathVariable Long cid)
+			throws IOException {
 		Card card = cardRepo.findOne(new CardKey(did, cid));
 		if (card == null) {
 			throw new EntityNotFoundException("Card not found for (door=" + did + ",card=" + cid + ")");
@@ -116,12 +120,10 @@ public class DoorController {
 
 	@PostMapping("/{did}/cards")
 	@Transactional
-	public Card addCard(@PathVariable Long did, @RequestParam Long cid, @RequestParam Long workerId,
-			@RequestParam(required = false, defaultValue = "false") boolean upload) throws IOException {
-		Door door = repo.findOne(did);
-		if (door == null) {
-			throw new IllegalArgumentException("Door not found : " + did);
-		}
+	public Card addCard(@PathVariable Long domainId, @PathVariable Long did, @RequestParam Long cid,
+			@RequestParam Long workerId, @RequestParam(required = false, defaultValue = "false") boolean upload)
+			throws IOException {
+		Door door = this.getDoor(domainId, did);
 		Worker worker = workerRepo.findOne(workerId);
 		if (worker == null) {
 			throw new IllegalArgumentException("Worker not found : " + workerId);
@@ -144,29 +146,27 @@ public class DoorController {
 
 	@DeleteMapping("/{did}/cards/{cid}")
 	@Transactional
-	public void delCard(@PathVariable Long did, @PathVariable Long cid,
+	public void delCard(@PathVariable Long domainId, @PathVariable Long did, @PathVariable Long cid,
 			@RequestParam(required = false, defaultValue = "true") boolean upload) throws IOException {
 		CardKey key = new CardKey(did, cid);
 		cardRepo.delete(key);
 		logger.info("Card deleted:" + key);
 		if (upload) {
-			DoorSystem doorSys = getDoorSystem(did);
+			DoorSystem doorSys = getDoorSystem(domainId, did);
 			doorSys.deleteCard(new long[] { cid });
 			logger.info("Card deleted from door system :" + key);
 		}
 	}
 
 	@PostMapping("/{did}/cards/{cid}/to-black-list")
-	public void addCardToBlackList(@PathVariable Long did, @PathVariable Long cid) throws IOException {
-		DoorSystem doorSys = getDoorSystem(did);
+	public void addCardToBlackList(@PathVariable Long domainId, @PathVariable Long did, @PathVariable Long cid)
+			throws IOException {
+		DoorSystem doorSys = getDoorSystem(domainId, did);
 		doorSys.addCardToBlackList(cid);
 	}
 
-	private DoorSystem getDoorSystem(Long id) {
-		Door door = repo.findOne(id);
-		if (door == null) {
-			throw new IllegalArgumentException("Door not found : " + id);
-		}
+	private DoorSystem getDoorSystem(Long domainId, Long id) {
+		Door door = this.getDoor(domainId, id);
 		DoorSystem doorSys = doorSysFactory.apply(door);
 		return doorSys;
 	}

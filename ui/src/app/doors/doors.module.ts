@@ -1,4 +1,4 @@
-import { DoorsMainComponent } from './doors.main.component';
+import { DoorsMainComponent } from './doors-main/doors.main.component';
 import { ShareModule } from './../share/share.module';
 import { AppRoutingModule } from './../app-routing.module';
 import { NgModule } from '@angular/core';
@@ -22,7 +22,11 @@ const DoorRoutes: Routes = [
         path: '',
         component: DoorsComponent
       },
-      { path: ':id', component: DoorComponent }
+      {
+        path: ':domainId',
+        component: DoorsComponent
+      },
+      { path: ':domainId/:id', component: DoorComponent }
     ]
   }
 ];

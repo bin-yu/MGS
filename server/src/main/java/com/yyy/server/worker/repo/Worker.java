@@ -53,7 +53,7 @@ public class Worker implements Serializable {
     @Column(nullable = false, columnDefinition ="BOOLEAN DEFAULT FALSE")
     private Boolean inBlackList = false;
     @JsonIgnore()
-	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	private Domain domain;
 
 

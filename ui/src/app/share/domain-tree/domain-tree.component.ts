@@ -243,11 +243,14 @@ export class DomainTreeComponent implements OnInit {
   }
   bindingComplete(event: any): void {
     // expand the root node
-    this.treeGrid.expandRow(this.dataAdapter.records[0].id);
-    if (this._selectedDomain && !isNaN(this._selectedDomain)) {
-      this.treeGrid.selectRow(this._selectedDomain);
+    const rootDomain = this.dataAdapter.records[0].id;
+    if (this.selected === null || isNaN(this.selected)) {
+      this.selected = rootDomain;
+    }
+    if (this.selected && !isNaN(this.selected)) {
+      this.treeGrid.selectRow(this.selected);
       // expand all its parents
-      this.expandParents(this._selectedDomain);
+      this.expandParents(this.selected);
     }
   }
   expandParents(rowKey) {

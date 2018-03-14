@@ -17,41 +17,37 @@ export class DoorService {
   getDoors(): Observable<Door[]> {
     return this.backend.list<Door>('/doors');
   }
-  getDoorsx(pageable: Pageable): Observable<PagedResp<Door>> {
-    return this.backend.listx<Door>('/doors', pageable);
+  getDoorsx(domainId: number, pageable: Pageable): Observable<PagedResp<Door>> {
+    return this.backend.listx<Door>('/domains/' + domainId + '/doors', pageable);
   }
-  getDoor(id: Number): Observable<Door> {
-    return this.backend.get<Door>('/doors/' + id);
+  getDoor(domainId: number, id: Number): Observable<Door> {
+    return this.backend.get<Door>('/domains/' + domainId + '/doors/' + id);
   }
-  addDoor(door: Door): Observable<Door> {
-    return this.backend.post<Door, Door>('/doors', door);
+  addDoor(domainId: number, door: Door): Observable<Door> {
+    return this.backend.post<Door, Door>('/domains/' + domainId + '/doors', door);
   }
-  updateDoor(door: Door): Observable<Door> {
-    return this.backend.put<Door>('/doors/' + door.id, door);
+  updateDoor(domainId: number, door: Door): Observable<Door> {
+    return this.backend.put<Door>('/domains/' + domainId + '/doors/' + door.id, door);
   }
-  deleteDoor(door: Door): Observable<void> {
-    return this.backend.delete<void>('/doors/' + door.id);
+  deleteDoor(domainId: number, door: Door): Observable<void> {
+    return this.backend.delete<void>('/domains/' + domainId + '/doors/' + door.id);
   }
 
-  getVersion(door: Door): Observable<string> {
-    return this.backend.get<Version>('/doors/' + door.id + '/version').pipe(
+  getVersion(domainId: number, door: Door): Observable<string> {
+    return this.backend.get<Version>('/domains/' + domainId + '/doors/' + door.id + '/version').pipe(
       map(version => version.version)
     );
   }
-  getCardAreaStatus(door: Door): Observable<CardAreaStatus> {
-    return this.backend.get<CardAreaStatus>('/doors/' + door.id + '/cardAreaStatus');
+  getCardAreaStatus(domainId: number, door: Door): Observable<CardAreaStatus> {
+    return this.backend.get<CardAreaStatus>('/domains/' + domainId + '/doors/' + door.id + '/cardAreaStatus');
   }
 
-  delCard(doorId: number, cardNo: number): Observable<void> {
-    return this.backend.delete<void>('/doors/' + doorId + '/cards/' + cardNo);
+  addCardToBlackList(domainId: number, door: Door, cardNo: number): Observable<void> {
+    return this.backend.post<void, void>('/domains/' + domainId + '/doors/' + door.id + '/cards/' + cardNo + '/to-black-list', null);
   }
 
-  addCardToBlackList(door: Door, cardNo: number): Observable<void> {
-    return this.backend.post<void, void>('/doors/' + door.id + '/cards/' + cardNo + '/to-black-list', null);
-  }
-
-  readCardData(door: Door, cardNo: number): Observable<CardData> {
-    return this.backend.get<CardData>('/doors/' + door.id + '/cards/' + cardNo + '/cardData');
+  readCardData(domainId: number, door: Door, cardNo: number): Observable<CardData> {
+    return this.backend.get<CardData>('/domains/' + domainId + '/doors/' + door.id + '/cards/' + cardNo + '/cardData');
   }
 
   getCards(doorId: number): Observable<Card[]> {
@@ -72,5 +68,8 @@ export class DoorService {
         upload: isUpload
       }
     });
+  }
+  delCard(doorId: number, cardNo: number): Observable<void> {
+    return this.backend.delete<void>('/doors/' + doorId + '/cards/' + cardNo);
   }
 }
