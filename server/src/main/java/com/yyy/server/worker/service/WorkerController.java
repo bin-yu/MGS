@@ -21,15 +21,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.yyy.server.card.repo.Card;
 import com.yyy.server.card.repo.CardRepo;
+import com.yyy.server.domain.repo.Domain;
 import com.yyy.server.worker.repo.Worker;
 import com.yyy.server.worker.repo.WorkerRepo;
 import com.yyy.server.workerIncident.repo.Incident;
 import com.yyy.server.workerIncident.repo.IncidentRepo;
 
 @RestController
-@RequestMapping({"/workers"})
+@RequestMapping({"/domains/{domainId}/workers"})
 public class WorkerController {
-    private Logger logger = LoggerFactory.getLogger(WorkerController.class);
+	private Logger logger = LoggerFactory.getLogger(WorkerController.class);
     @Autowired
     private WorkerRepo repo;
     @Autowired
@@ -38,20 +39,18 @@ public class WorkerController {
     private CardRepo cardRepo;
 
     @GetMapping
-    public Page<Worker> getWorkers(Pageable pageable) throws Exception {
-        Page<Worker> workers = repo.findAll(pageable);
-        logger.info("getWorkers: returned worker count:" + workers.getNumberOfElements());
-        return workers;
+    public Page<Worker> getWorkers(@PathVariable Long domainId,Pageable pageable) throws Exception {
+    	return repo.findByDomain(new Domain(domainId), pageable);
     }
 
     @GetMapping("/search")
-    public Page<Worker> findWorkerByNameLike(@RequestParam() String nameLike, Pageable pageable) throws Exception {
-        return repo.findByNameLike(nameLike, pageable);
+    public Page<Worker> findWorkerByNameLike(@PathVariable Long domainId,@RequestParam() String nameLike, Pageable pageable) throws Exception {
+        return repo.findByDomainAndNameLike(new Domain(domainId),nameLike, pageable);
     }
 
     @GetMapping("/{id}")
-    public Worker getWorker(@PathVariable Long id) {
-        Worker worker = repo.findOne(id);
+    public Worker getWorker(@PathVariable Long domainId,@PathVariable Long id) {
+        Worker worker = repo.getByIdAndDomain(id, new Domain(domainId));
         if(worker==null){
         	throw new EntityNotFoundException("Worker not found for id : "+id);
         }
@@ -59,41 +58,37 @@ public class WorkerController {
     }
 
     @PostMapping()
-    public Worker addWorker(@RequestBody Worker worker) {
+    public Worker addWorker(@PathVariable Long domainId,@RequestBody Worker worker) {
+    	worker.setDomain(new Domain(domainId));
         return repo.save(worker);
     }
 
     @PutMapping("/{id}")
-    public Worker updateWorker(@PathVariable Long id, @RequestBody Worker worker) {
+    public Worker updateWorker(@PathVariable Long domainId,@PathVariable Long id, @RequestBody Worker worker) {
         if (!id.equals(worker.getId())) {
             throw new IllegalArgumentException("Mismatched id between path variable and request body.");
         }
+        worker.setDomain(new Domain(domainId));
         return repo.save(worker);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteWorker(@PathVariable Long id) {
-        repo.delete(id);
+    public void deleteWorker(@PathVariable Long domainId,@PathVariable Long id) {
+        repo.delete(getWorker(domainId, id));
     }
 
     @GetMapping("/{id}/incidents")
-    public List<Incident> getIncidents(@PathVariable Long id) {
-        Worker worker = repo.findOne(id);
-        if (worker == null) {
-            throw new IllegalArgumentException("worker not found : " + id);
-        }
+    public List<Incident> getIncidents(@PathVariable Long domainId,@PathVariable Long id) {
+        Worker worker = this.getWorker(domainId, id);
         return incRepo.findBySubject(worker);
     }
 
     @GetMapping("/{id}/cards")
-    public List<Card> getCards(@PathVariable Long id) {
-        Worker worker = repo.findOne(id);
-        if (worker == null) {
-            throw new IllegalArgumentException("worker not found : " + id);
-        }
+    public List<Card> getCards(@PathVariable Long domainId,@PathVariable Long id) {
+        Worker worker = this.getWorker(domainId, id);
         return cardRepo.findByWorker(worker);
     }
-
+    @RequestMapping({"/workers"})
     @GetMapping("/blackList")
     public List<Worker> getBlackListWorkers() throws Exception {
         return repo.findByInBlackList(true);

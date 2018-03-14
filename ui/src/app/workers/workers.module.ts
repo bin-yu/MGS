@@ -1,9 +1,9 @@
-import { WorkersMainComponent } from './workers.main.component';
+import { WorkersMainComponent } from './workers-main/workers.main.component';
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms'; // <-- NgModel lives here
-import { WorkersComponent } from './workers.component';
+import { WorkersComponent } from './workers/workers.component';
 import { WorkerComponent } from './worker/worker.component';
 import { AppRoutingModule } from '../app-routing.module';
 import { ShareModule } from '../share/share.module';
@@ -11,7 +11,7 @@ import { Routes, RouterModule } from '@angular/router';
 
 
 
-export { WorkersComponent } from './workers.component';
+export { WorkersComponent } from './workers/workers.component';
 export { WorkerComponent } from './worker/worker.component';
 
 const WorkerRoutes: Routes = [
@@ -23,7 +23,11 @@ const WorkerRoutes: Routes = [
         path: '',
         component: WorkersComponent
       },
-      { path: ':id', component: WorkerComponent }
+      {
+        path: ':domainId',
+        component: WorkersComponent
+      },
+      { path: ':domainId/:id', component: WorkerComponent }
     ]
   }
 ];

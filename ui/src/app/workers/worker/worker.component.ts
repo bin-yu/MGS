@@ -10,6 +10,7 @@ import { Location } from '@angular/common';
   styleUrls: ['./worker.component.scss']
 })
 export class WorkerComponent implements OnInit {
+  domainId: number;
   isAdd: boolean;
   worker: Worker;
   constructor(private route: ActivatedRoute, private _location: Location, private workerSrv: WorkerService) {
@@ -19,13 +20,14 @@ export class WorkerComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.domainId = +this.route.snapshot.paramMap.get('domainId');
     const id = +this.route.snapshot.paramMap.get('id');
     if (Number.isNaN(id)) {
       this.isAdd = true;
       return;
     }
     this.isAdd = false;
-    this.workerSrv.getWorker(id).subscribe(
+    this.workerSrv.getWorker(this.domainId, id).subscribe(
       worker => {
         this.worker = worker;
       }
@@ -34,14 +36,14 @@ export class WorkerComponent implements OnInit {
 
   onSubmit(): void {
     if (this.isAdd) {
-      this.workerSrv.addWorker(this.worker).subscribe(
+      this.workerSrv.addWorker(this.domainId, this.worker).subscribe(
         worker => {
           this._location.back();
         }
       );
     } else {
       // update worker
-      this.workerSrv.updateWorker(this.worker).subscribe(
+      this.workerSrv.updateWorker(this.domainId, this.worker).subscribe(
         worker => {
           this._location.back();
         }

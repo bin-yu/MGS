@@ -18,7 +18,7 @@ import { Worker, WorkerService } from '../../backend/backend.module';
   styleUrls: ['./worker-input.component.scss']
 })
 export class WorkerInputComponent implements OnInit {
-
+  domainId: number;
   _worker: Worker;
   @Output() selectedChange = new EventEmitter();
   pageable = new Pageable(0, 10, 'id');
@@ -34,7 +34,7 @@ export class WorkerInputComponent implements OnInit {
         .distinctUntilChanged()
         .do(() => this.searching = true)
         .switchMap(term =>
-          this.workerSrv.findWorkers(term, this.pageable)
+          this.workerSrv.findWorkers(this.domainId, term, this.pageable)
             .do(() => this.searchFailed = false)
             .catch(() => {
               this.searchFailed = true;

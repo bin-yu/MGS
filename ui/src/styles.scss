@@ -72,3 +72,11 @@ For Jqx-widget tree
   border:none;
   cursor: pointer;
 }
+.treeOuter {
+  height: 100%;
+  padding-right: 30px;
+}
+.treePanel {
+  height: 100%;
+  border-right: 4px double #eee;
+}

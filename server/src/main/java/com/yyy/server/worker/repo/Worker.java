@@ -11,15 +11,20 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.yyy.server.card.repo.Card;
+import com.yyy.server.domain.repo.Domain;
 import com.yyy.server.workerIncident.repo.Incident;
 import com.yyy.server.workerIncident.repo.Incident.Category;
 @Entity
+@Table(indexes={@Index(name="idx_worker_domain_and_id",columnList="DOMAIN_ID,ID")})
 @JsonIgnoreProperties(ignoreUnknown=true)
 public class Worker implements Serializable {
     private static final long serialVersionUID = -8743126316266346607L;
@@ -47,6 +52,9 @@ public class Worker implements Serializable {
     private String employer;
     @Column(nullable = false, columnDefinition ="BOOLEAN DEFAULT FALSE")
     private Boolean inBlackList = false;
+    @JsonIgnore()
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	private Domain domain;
 
 
     @JsonIgnore
@@ -134,7 +142,13 @@ public class Worker implements Serializable {
     public void setCards(List<Card> cards) {
         this.cards = cards;
     }
+    public void setDomain(Domain domain) {
+		this.domain = domain;
+	}
 
+	public Domain getDomain() {
+		return domain;
+	}
     @JsonGetter
     public int getScore() {
         int total = 0;

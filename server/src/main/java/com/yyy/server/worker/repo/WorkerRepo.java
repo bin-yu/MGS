@@ -7,9 +7,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import com.yyy.server.domain.repo.Domain;
+
 @Repository
 public interface WorkerRepo extends PagingAndSortingRepository<Worker, Long> {
-    List<Worker> findByInBlackList(boolean inBlackList);
+    List<Worker> findByInBlackList(Boolean inBlackList);
 
-    Page<Worker> findByNameLike(String namePart, Pageable pageable);
+    Page<Worker> findByDomain(Domain domain,Pageable pageable);
+    Worker getByIdAndDomain(Long id,Domain domain);
+	Page<Worker> findByDomainAndNameLike(Domain domain,String nameLike, Pageable pageable);
+
 }

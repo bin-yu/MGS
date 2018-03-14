@@ -10,26 +10,23 @@ import { PagedResp } from '../paged-resp';
 export class WorkerService {
 
   constructor(private backend: BackendService) { }
-  getWorkers(): Observable<Worker[]> {
-    return this.backend.list<Worker>('/workers');
+  getWorkersx(domainId: number, pageable: Pageable): Observable<PagedResp<Worker>> {
+    return this.backend.listx<Worker>('/domains/' + domainId + '/workers', pageable);
   }
-  getWorkersx(pageable: Pageable): Observable<PagedResp<Worker>> {
-    return this.backend.listx<Worker>('/workers', pageable);
+  getWorker(domainId: number, id: Number): Observable<Worker> {
+    return this.backend.get<Worker>('/domains/' + domainId + '/workers/' + id);
   }
-  getWorker(id: Number): Observable<Worker> {
-    return this.backend.get<Worker>('/workers/' + id);
+  addWorker(domainId: number, worker: Worker): Observable<Worker> {
+    return this.backend.post<Worker, Worker>('/domains/' + domainId + '/workers', worker);
   }
-  addWorker(worker: Worker): Observable<Worker> {
-    return this.backend.post<Worker, Worker>('/workers', worker);
+  updateWorker(domainId: number, worker: Worker): Observable<Worker> {
+    return this.backend.put<Worker>('/domains/' + domainId + '/workers/' + worker.id, worker);
   }
-  updateWorker(worker: Worker): Observable<Worker> {
-    return this.backend.put<Worker>('/workers/' + worker.id, worker);
+  deleteWorker(domainId: number, worker: Worker): Observable<void> {
+    return this.backend.delete<void>('/domains/' + domainId + '/workers/' + worker.id);
   }
-  deleteWorker(worker: Worker): Observable<void> {
-    return this.backend.delete<void>('/workers/' + worker.id);
-  }
-  findWorkersx(nameLike: string, pageable: Pageable): Observable<PagedResp<Worker>> {
-    return this.backend.getx<PagedResp<Worker>>('/workers/search', {
+  findWorkersx(domainId: number, nameLike: string, pageable: Pageable): Observable<PagedResp<Worker>> {
+    return this.backend.getx<PagedResp<Worker>>('/domains/' + domainId + '/workers/search', {
       params: {
         nameLike: '%' + nameLike + '%',
         page: '' + pageable.page,
@@ -38,8 +35,8 @@ export class WorkerService {
       }
     });
   }
-  findWorkers(nameLike: string, pageable: Pageable): Observable<Worker[]> {
-    return this.findWorkersx(nameLike, pageable).pipe(
+  findWorkers(domainId: number, nameLike: string, pageable: Pageable): Observable<Worker[]> {
+    return this.findWorkersx(domainId, nameLike, pageable).pipe(
       map(
         resp => resp.content
       )

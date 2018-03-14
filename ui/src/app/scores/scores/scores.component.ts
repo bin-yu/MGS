@@ -8,7 +8,7 @@ import { PageableComponent } from '../../share/share.module';
   styleUrls: ['./scores.component.scss']
 })
 export class ScoresComponent extends PageableComponent implements OnInit {
-
+  domainId:number;
   workers: Worker[];
 
   searchStr: string;
@@ -21,14 +21,14 @@ export class ScoresComponent extends PageableComponent implements OnInit {
   }
   reloadItems(): void {
     if (this.searchStr && this.searchStr.length > 0) {
-      this.workerSrv.findWorkersx(this.searchStr, this.pageable).subscribe(
+      this.workerSrv.findWorkersx(this.domainId, this.searchStr, this.pageable).subscribe(
         resp => {
           this.totalItems = resp.totalElements;
           this.workers = resp.content;
         }
       );
     } else {
-      this.workerSrv.getWorkersx(this.pageable).subscribe(
+      this.workerSrv.getWorkersx(this.domainId, this.pageable).subscribe(
         resp => {
           this.totalItems = resp.totalElements;
           this.workers = resp.content;

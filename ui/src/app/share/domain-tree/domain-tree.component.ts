@@ -15,6 +15,9 @@ export class DomainTreeComponent implements OnInit {
   @ViewChild('TreeGrid') treeGrid: jqxTreeGridComponent;
   @Output() selectedChange = new EventEmitter();
   private _selectedDomain;
+  localizeObj = {
+    filtersearchstring: ''
+  };
   source: any =
     {
       dataType: 'json',
@@ -169,13 +172,13 @@ export class DomainTreeComponent implements OnInit {
     toolBar.append(container);
     addButton.jqxButton({ cursor: 'pointer', enableDefault: false, disabled: true, height: 25, width: 25 });
     addButton.find('div:first').addClass(toTheme('jqx-icon-plus'));
-    addButton.jqxTooltip({ position: 'bottom', content: 'Add' });
+    addButton.jqxTooltip({ position: 'bottom', content: '添加' });
     editButton.jqxButton({ cursor: 'pointer', disabled: true, enableDefault: false, height: 25, width: 25 });
     editButton.find('div:first').addClass(toTheme('jqx-icon-edit'));
-    editButton.jqxTooltip({ position: 'bottom', content: 'Edit' });
+    editButton.jqxTooltip({ position: 'bottom', content: '修改' });
     deleteButton.jqxButton({ cursor: 'pointer', disabled: true, enableDefault: false, height: 25, width: 25 });
     deleteButton.find('div:first').addClass(toTheme('jqx-icon-delete'));
-    deleteButton.jqxTooltip({ position: 'bottom', content: 'Delete' });
+    deleteButton.jqxTooltip({ position: 'bottom', content: '删除' });
 
     this.buttonsObject = {
       addButton: addButton,
