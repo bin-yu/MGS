@@ -3,7 +3,7 @@ export class User {
     name: string;
     displayName: string;
     password: string;
-    role = 'ADMIN';
+    role = ROLE_USER;
     public static clone(copy): User {
         const p = Object.assign(new User(), copy);
         return p;
@@ -12,7 +12,9 @@ export class User {
         return Role[this.role];
     }
 }
+export const ROLE_ADMIN = 'ADMIN';
+export const ROLE_USER = 'USER';
 export enum Role {
-    ADMIN = '管理员',
-    USER = '普通用户'
+    ADMIN = '系统管理员',
+    USER = '施工方管理员'
 }

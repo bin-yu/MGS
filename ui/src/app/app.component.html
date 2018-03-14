@@ -27,7 +27,7 @@
                             <a routerLink="/incidents">
                                 <i class="fa fas fa-calendar"></i> 红黑事件录入</a>
                         </li>
-                        <li>
+                        <li *ngIf="(loginRole === 'ADMIN')">
                             <a routerLink="/scores">
                                 <i class="fa fas fa-star"></i> 积分查询</a>
                         </li>
@@ -50,18 +50,18 @@
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item" data-toggle="tooltip" data-placement="right" title="门禁智能策略管理">
+                <li *ngIf="(loginRole === 'ADMIN')" class="nav-item" data-toggle="tooltip" data-placement="right" title="门禁智能策略管理">
                     <a class="nav-link" routerLink="/policies">
                         <i class="fa fas fa-globe"></i>
                         <span class="nav-link-text">门禁智能策略管理</span>
                     </a>
                 </li>
-                <li class="nav-item" data-toggle="tooltip" data-placement="right" title="系统事件查看">
+                <!-- <li class="nav-item" data-toggle="tooltip" data-placement="right" title="系统事件查看">
                     <a class="nav-link" routerLink="/policies">
                         <i class="fa fa-fw fa-wrench"></i>
                         <span class="nav-link-text">系统事件查看</span>
                     </a>
-                </li>
+                </li> -->
                 <li class="nav-item" data-toggle="tooltip" data-placement="right" title="系统用户管理">
                     <a class="nav-link" routerLink="/users">
                         <i class="fa fas fa-users"></i>
@@ -77,7 +77,7 @@
                 </li>
             </ul>
             <ul class="navbar-nav ml-auto">
-                <li class="nav-item dropdown">
+                <!-- <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle mr-lg-2" id="alertsDropdown" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="fa fa-fw fa-bell"></i>
                         <span class="d-lg-none">Alerts
@@ -119,19 +119,10 @@
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item small" href="#">View all alerts</a>
                     </div>
-                </li>
+                </li> -->
                 <li class="nav-item">
-                    <form class="form-inline my-2 my-lg-0 mr-lg-2">
-                        <div class="input-group">
-                            <input class="form-control" type="text" placeholder="Search for...">
-                            <span class="input-group-append">
-                                <button class="btn btn-primary" type="button">
-                                    <i class="fa fa-search"></i>
-                                </button>
-                            </span>
-                        </div>
-                    </form>
-                </li>
+                        <div class="nav-link">{{loginUser.displayName}}，您好</div>    
+                    </li>
                 <li class="nav-item">
                     <a class="nav-link" (click)="logout()">
                         <i class="fa fa-fw fa-sign-out"></i>退出登录</a>

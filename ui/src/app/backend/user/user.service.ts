@@ -58,9 +58,6 @@ export class UserService {
     return this.backend.delete<void>('/domains/' + domainId + '/users/' + user.id);
   }
 
-  logout(): Observable<void> {
-    return this.backend.post<void, void>('/logout', null);
-  }
 
   checkLoginStatus(): Observable<string> {
     return this.backend.getx<string>('/status', { responseType: 'text' });

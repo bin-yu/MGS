@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { UserService, User, Role } from './../../backend/backend.module';
+import { AuthService, UserService, User, Role, ROLE_ADMIN, ROLE_USER } from './../../backend/backend.module';
+
 @Component({
   selector: 'app-user',
   templateUrl: './user.component.html',
@@ -12,8 +13,11 @@ export class UserComponent implements OnInit {
   isAdd: boolean;
   user: User;
   roles = Object.entries(Role);
-  constructor(private route: ActivatedRoute, private _location: Location, private userSrv: UserService) {
+  constructor(private route: ActivatedRoute, private _location: Location, private userSrv: UserService, authSrv: AuthService) {
     this.user = new User();
+    if (ROLE_USER === authSrv.loginRole) {
+      this.roles = this.roles.filter(value => value[0] === ROLE_USER);
+    }
   }
 
   ngOnInit() {

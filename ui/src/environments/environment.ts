@@ -6,5 +6,10 @@
 export const environment = {
   production: false,
   apibaseurl: 'http://localhost:8080/api',
-  domainRootUrl: '/domains/1'
+  domainRootUrl: '/domains/1',
+  mockUser: {
+    name: 'test',
+    displayName: '测试人员',
+    role: 'ADMIN'
+  }
 };

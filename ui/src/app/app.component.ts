@@ -1,8 +1,10 @@
+import { AuthService } from './backend/auth/auth.service';
 import { Location } from '@angular/common';
-import { UserService } from './backend/user/user.service';
+import { UserService, User } from './backend/backend.module';
 import * as $ from 'jquery';
 import { Component, Inject, OnInit } from '@angular/core';
 import { DOCUMENT } from '@angular/platform-browser';
+import { Role } from './backend/user/user';
 
 
 @Component({
@@ -14,14 +16,18 @@ export class AppComponent implements OnInit {
   scoreIsCollapsed = true;
   doorIsCollapsed = true;
   allIsCollapsed = false;
-  constructor(private useSrv: UserService, @Inject(DOCUMENT) private document: any, private location: Location) {
-    this.useSrv.checkLoginStatus().subscribe(
-      status => {
-        console.log('Check login status returns : ' + status);
+  loginUser: User;
+  constructor(private authSrv: AuthService, @Inject(DOCUMENT) private document: any, private location: Location) {
+    this.authSrv.init().subscribe(
+      loginUser => {
+        this.loginUser = loginUser;
       }
     );
   }
   ngOnInit() {
+  }
+  get loginRole(): String {
+    return this.authSrv.loginRole;
   }
   toggleSideBar(): void {
     this.allIsCollapsed = !this.allIsCollapsed;
@@ -38,7 +44,7 @@ export class AppComponent implements OnInit {
     return flag;
   }
   logout(): void {
-    this.useSrv.logout().subscribe(
+    this.authSrv.logout().subscribe(
       _ => {
         this.document.location.href = this.document.baseURI + 'login';
       }
