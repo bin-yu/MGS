@@ -2,7 +2,7 @@ proxy:
   doorSecrets: AAA,BBB,TEST
   reconnect.delayInSecs: 600
   server:
-    host: localhost
+    host: www.mgssys.xyz
     port: 8443
   trustStore:
     path: ./src/main/resources/client-store.pkcs

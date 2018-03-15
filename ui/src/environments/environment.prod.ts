@@ -1,5 +1,6 @@
 export const environment = {
   production: true,
   apibaseurl: '/api',
-  domainRootUrl: '/domains'
+  domainRootUrl: '/domains',
+  mockUser: undefined
 };

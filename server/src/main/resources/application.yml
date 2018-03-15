@@ -25,6 +25,14 @@ security.basic.enabled: false
 
 ---
 spring:
+  profiles: alpha
+server.port: 443
+server.ssl.key-store: classpath:www.pfx
+server.ssl.key-store-password: changeme
+server.ssl.key-password: changeme
+
+---
+spring:
   profiles: prod
   datasource:
     url: jdbc:mysql://localhost:3306/mgs?useSSL=false

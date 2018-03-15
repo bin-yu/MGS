@@ -24,7 +24,7 @@
         <input type="checkbox" (change)="handleSelectEvent($event,door)" />
       </th>
       <td>
-        <a href="#" routerLink="/doors/{{door.id}}">{{(door.label == null )?door.sn:door.label}}</a>
+        <a href="#" routerLink="./{{door.id}}">{{(door.label == null )?door.sn:door.label}}</a>
       </td>
       <td>{{door.protocol}}</td>
       <td>{{door.sn}}</td>

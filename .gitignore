@@ -5,3 +5,7 @@
 /server/src/main/resources/static/*
 /server/db/*.lck
 .settings
+/server/src/main/resources/*.jks
+/server/src/main/resources/*.pfx
+/door-proxy/src/main/resources/*.jks
+/door-proxy/src/main/resources/*.pkcs

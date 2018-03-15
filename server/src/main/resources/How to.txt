@@ -1,0 +1,8 @@
+1. change keystore type to pkcs:
+keytool -importkeystore -srcstoretype JKS -srckeystore keystore.jks -srcstorepass changeme -srcalias rootca -srckeypass changeme -deststoretype PKCS12 -destkeystore keystore.p12 -deststorepass changeme -destalias rootca -destkeypass changeme -noprompt
+2. export PEM certificate:
+openssl pkcs12 -in keystore.p12 -out certificate.pem -passin pass:changeme -nokeys
+3. export private key:
+openssl pkcs12 -in keystore.p12 -out private.pem -passin pass:changeme -nocerts -nodes
+4. generate CSR:
+openssl req -new -sha256 -key private.pem -subj "/C=CN/ST=Sichuan/L=Chengdu/O=MGS/OU=MGS Server/CN=www.mgssys.xyz" -out csr.pem -outform PEM -reqexts SAN -config <(cat /etc/ssl/openssl.cnf <(printf "\n[SAN]\nsubjectAltName=DNS:www.mgssys.xyz"))
