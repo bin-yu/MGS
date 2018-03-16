@@ -5,5 +5,5 @@ proxy:
     host: www.mgssys.xyz
     port: 8443
   trustStore:
-    path: ./src/main/resources/client-store.pkcs
+    path: ${keystore.path}
     password: changeme

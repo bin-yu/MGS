@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -85,13 +86,15 @@ public class DoorProxy implements Runnable {
     }
 
     public void start() {
+    	logger.info("Starting DoorProxy Listener...");
         t = new Thread(this, "DoorProxy Listener");
         t.setDaemon(true);
         t.start();
     }
-
+    @PreDestroy
     public void stop() throws InterruptedException {
         if (t != null) {
+        	logger.info("Stopping DoorProxy Listener...");
             isRunning = false;
             t.interrupt();
             t.join(3000);

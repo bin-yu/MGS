@@ -36,31 +36,33 @@ set PATH_JAR=%MYPATH%
 echo "%PATH_JAR%door-proxy.jar"
 
 rem Allow prunsrv to be overridden
-if "%PRUNSRV%" == "" set PRUNSRV=%PATH_PRUNSRV%prunsrv
+if "%PRUNSRV%" == "" set PRUNSRV=%PATH_PRUNSRV%amd64/prunsrv
 
 rem Install the 2 services
 
-rem echo Installing %SERVICE_JVM%
-rem %PRUNSRV% //DS//%SERVICE_JVM%
-rem %PRUNSRV% //IS//%SERVICE_JVM%
+echo Installing %SERVICE_JVM%
+%PRUNSRV% //DS//%SERVICE_JVM%
+%PRUNSRV% //IS//%SERVICE_JVM%
 
-rem echo Setting the parameters for %SERVICE_JVM%
-rem %PRUNSRV% //US//%SERVICE_JVM% --Jvm=auto --StdOutput auto --StdError auto ^
-rem --Classpath=%PATH_JAR%door-proxy.jar ^
-rem --StartMode=jvm --StartClass=org.yyy.doorproxy.DoorProxyDeamon --StartMethod=start ^
-rem  --StopMode=jvm  --StopClass=org.yyy.doorproxy.DoorProxyDeamon  --StopMethod=stop
+echo Setting the parameters for %SERVICE_JVM%
+%PRUNSRV% //US//%SERVICE_JVM% --Jvm=auto --StdOutput auto --StdError auto ^
+ --JvmOptions=-Dkeystore.path=%PATH_JAR%client-store.pkcs ^
+ --Classpath=%PATH_JAR%door-proxy.jar ^
+ --StartPath=%PATH_JAR%
+ --StartMode=jvm --StartClass=org.yyy.doorproxy.Bootstrap --StartMethod=start ^
+ --StopMode=jvm  --StopClass=org.yyy.doorproxy.Bootstrap  --StopMethod=stop
 
-rem echo Installation of %SERVICE_JVM% is complete
+echo Installation of %SERVICE_JVM% is complete
 
-echo Installing %SERVICE_JAVA%
-%PRUNSRV% //DS//%SERVICE_JAVA%
-%PRUNSRV% //IS//%SERVICE_JAVA%
+rem echo Installing %SERVICE_JAVA%
+rem  %PRUNSRV% //DS//%SERVICE_JAVA%
+rem  %PRUNSRV% //IS//%SERVICE_JAVA%
 
-echo Setting the parameters for %SERVICE_JAVA%
-%PRUNSRV% //US//%SERVICE_JAVA% --Jvm=auto --StdOutput auto --StdError auto ^
---Classpath=%PATH_JAR%door-proxy.jar ^
---StartMode=java --StartClass=org.springframework.boot.loader.JarLauncher --StartParams=start ^
- --StopMode=java  --StopClass=org.springframework.boot.loader.JarLauncher  --StopParams=stop
+rem  echo Setting the parameters for %SERVICE_JAVA%
+rem %PRUNSRV% //US//%SERVICE_JAVA% --Jvm=auto --StdOutput auto --StdError auto ^
+rem  --Classpath=%PATH_JAR%door-proxy.jar ^
+rem  --StartMode=java --StartClass=org.springframework.boot.loader.JarLauncher --StartParams=start ^
+rem  --StopMode=java  --StopClass=org.springframework.boot.loader.JarLauncher  --StopParams=stop
 
-echo Installation of %SERVICE_JAVA% is complete
+rem  echo Installation of %SERVICE_JAVA% is complete
 echo Finished

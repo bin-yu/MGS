@@ -1,12 +1,10 @@
 package org.yyy.doorproxy;
 
-import java.io.File;
-import java.lang.reflect.Method;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.boot.loader.JarLauncher;
-import org.springframework.boot.loader.archive.Archive;
-import org.springframework.boot.loader.archive.JarFileArchive;
 import org.springframework.boot.loader.jar.JarFile;
 
 public class Bootstrap extends JarLauncher {
@@ -14,21 +12,30 @@ public class Bootstrap extends JarLauncher {
     private static ClassLoader classLoader = null;
     private static Bootstrap bootstrap = null;
 
-    protected void launch(String[] args, String mainClass, ClassLoader classLoader, String method) throws Exception {
+    /*protected void launch(String[] args, String mainClass, ClassLoader classLoader, String method) throws Exception {
         Class<?> cls = classLoader.loadClass(mainClass);
         Method m = cls.getDeclaredMethod(method, args.getClass());
         m.invoke(null, (Object) args);
+    }*/
+    protected void launch(String[] args, String mainClass, ClassLoader classLoader, boolean wait)
+            throws Exception {
+        Thread.currentThread().setContextClassLoader(classLoader);
+        Thread runnerThread = new Thread(() -> {
+            try {
+                createMainMethodRunner(mainClass, args, classLoader).run();
+            }
+            catch(Exception ex) {}
+        });
+        runnerThread.setContextClassLoader(classLoader);
+        runnerThread.setName(Thread.currentThread().getName());
+        runnerThread.start();
+        if (wait == true) {
+            runnerThread.join();
+        }
     }
 
-    public Bootstrap() {
-        super();
-    }
 
-    public Bootstrap(Archive archive) {
-        super(archive);
-    }
-
-    public static void start(String[] args) {
+    /*public static void start(String[] args) {
         try {
             String PATH_PROXY_JAR = System.getProperty("proxyjar.path", "./target/door-proxy.jar");
             JarFile.registerUrlProtocolHandler();
@@ -40,16 +47,35 @@ public class Bootstrap extends JarLauncher {
             ex.printStackTrace();
             System.exit(1);
         }
+    }*/
+    public static void start (String []args) {
+        bootstrap = new Bootstrap ();
+        try {
+            JarFile.registerUrlProtocolHandler();
+            classLoader = bootstrap.createClassLoader(bootstrap.getClassPathArchives());
+            List<String> argList = new ArrayList<String>();
+            argList.add("start");
+            argList.addAll(Arrays.asList(args));
+            bootstrap.launch(argList.toArray(new String[0]), bootstrap.getMainClass(), classLoader, true);
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            System.exit(1);
+        }
     }
-
-    public static void stop(String[] args) {
+ 
+    public static void stop (String []args) {
         try {
             if (bootstrap != null) {
-                bootstrap.launch(args, bootstrap.getMainClass(), classLoader, "stop");
+            	List<String> argList = new ArrayList<String>();
+                argList.add("stop");
+                argList.addAll(Arrays.asList(args));
+                bootstrap.launch(argList.toArray(new String[0]), bootstrap.getMainClass(), classLoader, true);
                 bootstrap = null;
                 classLoader = null;
             }
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             ex.printStackTrace();
             System.exit(1);
         }
