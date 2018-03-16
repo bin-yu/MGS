@@ -48,7 +48,7 @@ echo Setting the parameters for %SERVICE_JVM%
 %PRUNSRV% //US//%SERVICE_JVM% --Jvm=auto --StdOutput auto --StdError auto ^
  --JvmOptions=-Dkeystore.path=%PATH_JAR%client-store.pkcs ^
  --Classpath=%PATH_JAR%door-proxy.jar ^
- --StartPath=%PATH_JAR%
+ --StartPath=%PATH_JAR% ^
  --StartMode=jvm --StartClass=org.yyy.doorproxy.Bootstrap --StartMethod=start ^
  --StopMode=jvm  --StopClass=org.yyy.doorproxy.Bootstrap  --StopMethod=stop
 

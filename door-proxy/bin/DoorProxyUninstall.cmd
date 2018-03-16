@@ -32,10 +32,10 @@ set PR_LOGPATH=%PATH_PRUNSRV%
 rem Allow prunsrv to be overridden
 if "%PRUNSRV%" == "" set PRUNSRV=%PATH_PRUNSRV%prunsrv
 
-rem echo Removing %SERVICE_JVM%
-rem %PRUNSRV% //DS//%SERVICE_JVM%
+echo Removing %SERVICE_JVM%
+%PRUNSRV% //DS//%SERVICE_JVM%
 
-echo Removing %SERVICE_JAVA%
-%PRUNSRV% //DS//%SERVICE_JAVA%
+rem echo Removing %SERVICE_JAVA%
+rem %PRUNSRV% //DS//%SERVICE_JAVA%
 
 echo Finished
