@@ -9,3 +9,4 @@
 /server/src/main/resources/*.pfx
 /door-proxy/src/main/resources/*.jks
 /door-proxy/src/main/resources/*.pkcs
+/door-proxy/doorproxy/target/
