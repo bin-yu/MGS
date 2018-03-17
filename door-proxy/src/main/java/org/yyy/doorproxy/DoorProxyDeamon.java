@@ -186,7 +186,7 @@ public class DoorProxyDeamon implements Runnable {
 				}
 			}
 			proxy.stop();
-		} catch (InterruptedException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			ctx.close();

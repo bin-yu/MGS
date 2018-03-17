@@ -64,6 +64,27 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.8</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<configuration>
+							<target>
+								<echo message="Adding Bootstrap class into the spring-boot repackaged jar..."/>
+								<!-- Place any Ant task here. You can add anything you can add between 
+									<target> and </target> in a build.xml. -->
+								<jar update="true" keepcompression="true" destfile="target/${project.build.finalName}.jar" basedir="target/classes" includes="org/yyy/doorproxy/Bootstrap.class"/>
+								<copy file="target/${project.build.finalName}.jar" tofile="bin/${project.build.finalName}.jar" overwrite="true" verbose="true"/>
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 </project>

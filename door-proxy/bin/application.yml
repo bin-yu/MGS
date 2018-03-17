@@ -1,0 +1,3 @@
+proxy:
+  doorSecrets: AAA,BBB,TEST
+  reconnect.delayInSecs: 60

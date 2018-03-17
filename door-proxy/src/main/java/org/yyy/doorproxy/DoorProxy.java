@@ -44,185 +44,194 @@ import com.yyy.proxy.common.server.DoorRequestCommand;
 @Service
 public class DoorProxy implements Runnable {
 
-    private static Logger logger = LoggerFactory.getLogger(DoorProxy.class);
+	private static Logger logger = LoggerFactory.getLogger(DoorProxy.class);
 
-    @Value("${proxy.reconnect.delayInSecs}")
-    private int reconDelaySecs = 600 * 1000;
-    @Value("${proxy.server.host}")
-    private String host;
-    @Value("${proxy.server.port}")
-    private int port;
-    @Value("${proxy.trustStore.path}")
-    private String keyStorePath;
-    @Value("${proxy.trustStore.password}")
-    private String ksPass = "changeme";
+	@Value("${proxy.reconnect.delayInSecs}")
+	private int reconDelaySecs = 60 * 1000;
+	@Value("${proxy.server.host}")
+	private String host;
+	@Value("${proxy.server.port}")
+	private int port;
+	@Value("${proxy.trustStore.path}")
+	private String keyStorePath;
+	@Value("${proxy.trustStore.password}")
+	private String ksPass = "changeme";
 
-    @Value("${proxy.doorSecrets}")
-    private String secrets;
+	@Value("${proxy.doorSecrets}")
+	private String secrets;
 
-    private SSLSocketFactory ssf;
+	private SSLSocketFactory ssf;
+	SSLSocket socket;
 
-    @Autowired
-    private Function<String, CommandExecutor> executorFac;
+	@Autowired
+	private Function<String, CommandExecutor> executorFac;
 
-    private Thread t;
-    private volatile boolean isRunning = true;
+	private Thread t;
+	private volatile boolean isRunning = true;
 
-    @PostConstruct
-    public void prepareSocketFactory() {
-        try {
-            logger.info("Initializing door proxy...");
-            SSLContext sc = SSLContext.getInstance("TLSv1.2");
-            SecureRandom rand = new SecureRandom();
+	@PostConstruct
+	public void prepareSocketFactory() {
+		try {
+			logger.info("Initializing door proxy...");
+			SSLContext sc = SSLContext.getInstance("TLSv1.2");
+			SecureRandom rand = new SecureRandom();
 
-            KeyStore ks = loadKeystore();
-            TrustManager[] tm = getTrustManagers(ks);
-            KeyManager[] km = getKeyManagers(ks);
-            sc.init(km, tm, rand);
-            ssf = sc.getSocketFactory();
-        } catch (Throwable t) {
-            throw new RuntimeException("Failed to init door proxy!", t);
-        }
-    }
+			KeyStore ks = loadKeystore();
+			TrustManager[] tm = getTrustManagers(ks);
+			KeyManager[] km = getKeyManagers(ks);
+			sc.init(km, tm, rand);
+			ssf = sc.getSocketFactory();
+		} catch (Throwable t) {
+			throw new RuntimeException("Failed to init door proxy!", t);
+		}
+	}
 
-    public void start() {
-    	logger.info("Starting DoorProxy Listener...");
-        t = new Thread(this, "DoorProxy Listener");
-        t.setDaemon(true);
-        t.start();
-    }
-    @PreDestroy
-    public void stop() throws InterruptedException {
-        if (t != null) {
-        	logger.info("Stopping DoorProxy Listener...");
-            isRunning = false;
-            t.interrupt();
-            t.join(3000);
-        }
-    }
+	public void start() {
+		logger.info("Starting DoorProxy Listener...");
+		t = new Thread(this, "DoorProxy Listener");
+		t.setDaemon(true);
+		t.start();
+	}
 
-    @Override
-    public void run() {
-        try {
-            while (isRunning) {
-                logger.info("Connecting to " + host + ":" + port + "...");
-                try (SSLSocket s = (SSLSocket) ssf.createSocket(host, port)) {
-                    logger.info("Connected!");
-                    try (BufferedWriter out = new BufferedWriter(new OutputStreamWriter(s.getOutputStream(), "UTF-8"))) {
-                        logger.info("Registering doors : " + secrets);
-                        sendCommand(out, new RegisterCommand(secrets.split(",")));
+	@PreDestroy
+	public void stop() throws InterruptedException, IOException {
+		if (t != null) {
+			logger.info("Stopping DoorProxy Listener...");
+			isRunning = false;
+			if (this.socket != null) {
+				this.socket.close();
+			}
+			t.interrupt();
+			t.join(3000);
+		}
+	}
 
-                        try (BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream(), "UTF-8"))) {
-                            while (true) {
-                                DoorRequestCommand cmd = null;
-                                try {
-                                    cmd = receiveCommand(in);
-                                    Command respCmd = executorFac.apply(cmd.getProtocol()).execute(cmd);
-                                    sendCommand(out, respCmd);
-                                } catch (RecoverableException e) {
-                                    // send error response
-                                    logger.info("Sending Error Response : " + e.getMessage());
-                                    String secret = secrets;
-                                    if (cmd != null) {
-                                        secret = cmd.getSecret();
-                                    }
-                                    ErrorResponseCommand respCmd = new ErrorResponseCommand(secret, e.getMessage());
-                                    sendCommand(out, respCmd);
-                                }
-                            }
-                        }
-                    } catch (IOException e) {
-                        logger.warn("Connection error!", e);
-                        logger.info("Will reconnect in " + reconDelaySecs + " seconds.");
-                        Thread.sleep(reconDelaySecs * 1000);
-                    } finally {
-                        logger.info("Disconnected!");
-                    }
-                }
+	@Override
+	public void run() {
+		try {
+			while (isRunning) {
+				logger.info("Connecting to " + host + ":" + port + "...");
+				try (SSLSocket s = (SSLSocket) ssf.createSocket(host, port)) {
+					logger.info("Connected!");
+					this.socket = s;
+					try (BufferedWriter out = new BufferedWriter(
+							new OutputStreamWriter(s.getOutputStream(), "UTF-8"))) {
+						logger.info("Registering doors : " + secrets);
+						sendCommand(out, new RegisterCommand(secrets.split(",")));
 
-            }
-        } catch (InterruptedException e) {
-            logger.warn("Door Proxy is interrupted!");
-        } catch (Throwable t) {
-            logger.error("Door Proxy is stopped by unexpected error!", t);
-        } finally {
-            logger.info("Door Proxy stopped.");
-        }
-    }
+						try (BufferedReader in = new BufferedReader(
+								new InputStreamReader(s.getInputStream(), "UTF-8"))) {
+							while (true) {
+								DoorRequestCommand cmd = null;
+								try {
+									cmd = receiveCommand(in);
+									Command respCmd = executorFac.apply(cmd.getProtocol()).execute(cmd);
+									sendCommand(out, respCmd);
+								} catch (RecoverableException e) {
+									// send error response
+									logger.info("Sending Error Response : " + e.getMessage());
+									String secret = secrets;
+									if (cmd != null) {
+										secret = cmd.getSecret();
+									}
+									ErrorResponseCommand respCmd = new ErrorResponseCommand(secret, e.getMessage());
+									sendCommand(out, respCmd);
+								}
+							}
+						}
+					}
+				} catch (IOException e) {
+					logger.warn("Connection error!", e);
+					logger.info("Will reconnect in " + reconDelaySecs + " seconds.");
+					Thread.sleep(reconDelaySecs * 1000);
+				} finally {
+					logger.info("Disconnected!");
+				}
 
-    private DoorRequestCommand receiveCommand(BufferedReader in) throws RecoverableException, IOException {
-        String msg = in.readLine();
-        logger.info("Message received : " + msg);
-        if (msg == null) {
-            logger.info("Received null message, the connection may be disconnected!");
-            throw new IOException("Connection is disconnected!");
-        }
-        try {
-            Command cmd = Command.deserializeS(msg);
-            logger.info("Command received : " + cmd);
-            if (!(cmd instanceof DoorRequestCommand)) {
-                throw new RecoverableException("Unexpected command type:" + cmd.getClass().getSimpleName());
-            }
-            return (DoorRequestCommand) cmd;
-        } catch (IOException e) {
-            String message = "Failed to deserialize the request command. Reason : " + e.getMessage();
-            logger.warn(message, e);
-            throw new RecoverableException(message);
-        }
-    }
+			}
+		} catch (InterruptedException e) {
+			logger.warn("Door Proxy is interrupted!");
+		} catch (Throwable t) {
+			logger.error("Door Proxy is stopped by unexpected error!", t);
+		} finally {
+			logger.info("Door Proxy stopped.");
+		}
+	}
 
-    private TrustManager[] getTrustManagers(KeyStore ks) {
-        try {
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            tmf.init(ks);
-            return tmf.getTrustManagers();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to load the trust managers for TLS connection.", e);
-        }
-    }
+	private DoorRequestCommand receiveCommand(BufferedReader in) throws RecoverableException, IOException {
+		String msg = in.readLine();
+		logger.info("Message received : " + msg);
+		if (msg == null) {
+			logger.info("Received null message, the connection may be disconnected!");
+			throw new IOException("Connection is disconnected!");
+		}
+		try {
+			Command cmd = Command.deserializeS(msg);
+			logger.info("Command received : " + cmd);
+			if (!(cmd instanceof DoorRequestCommand)) {
+				throw new RecoverableException("Unexpected command type:" + cmd.getClass().getSimpleName());
+			}
+			return (DoorRequestCommand) cmd;
+		} catch (IOException e) {
+			String message = "Failed to deserialize the request command. Reason : " + e.getMessage();
+			logger.warn(message, e);
+			throw new RecoverableException(message);
+		}
+	}
 
-    private KeyManager[] getKeyManagers(KeyStore ks) throws UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException {
-        KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        kmf.init(ks, ksPass.toCharArray());
-        return kmf.getKeyManagers();
-    }
+	private TrustManager[] getTrustManagers(KeyStore ks) {
+		try {
+			TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+			tmf.init(ks);
+			return tmf.getTrustManagers();
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to load the trust managers for TLS connection.", e);
+		}
+	}
 
-    private KeyStore loadKeystore() throws IOException, KeyStoreException, NoSuchAlgorithmException, CertificateException, FileNotFoundException {
-        File store = new File(keyStorePath);
-        logger.info("Loading trust managers from keystore :" + store.getCanonicalPath());
-        KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-        ks.load(new FileInputStream(store), ksPass.toCharArray());
-        printAliases(ks);
-        return ks;
-    }
+	private KeyManager[] getKeyManagers(KeyStore ks)
+			throws UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException {
+		KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+		kmf.init(ks, ksPass.toCharArray());
+		return kmf.getKeyManagers();
+	}
 
-    private void printAliases(KeyStore ks) throws KeyStoreException {
-        List<String> aliases = new ArrayList<String>(ks.size());
-        Enumeration<String> e = ks.aliases();
-        while (e.hasMoreElements()) {
-            aliases.add(e.nextElement());
-        }
-        logger.info("Loaded keystore aliases : " + aliases);
-    }
+	private KeyStore loadKeystore() throws IOException, KeyStoreException, NoSuchAlgorithmException,
+			CertificateException, FileNotFoundException {
+		File store = new File(keyStorePath);
+		logger.info("Loading trust managers from keystore :" + store.getCanonicalPath());
+		KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+		ks.load(new FileInputStream(store), ksPass.toCharArray());
+		printAliases(ks);
+		return ks;
+	}
 
-    private void sendCommand(BufferedWriter out, Command cmd) throws RecoverableException, IOException {
-        try {
-            logger.info("Command sending: " + cmd);
-            String sendMsg = cmd.serializeS();
-            logger.info("Message sent : " + sendMsg);
-            sendCommandMsg(out, sendMsg);
-        } catch (JsonProcessingException e) {
-            String message = "Failed to serialize the response command. Reason : " + e.getMessage();
-            logger.warn(message, e);
-            throw new RecoverableException(message);
-        }
-    }
+	private void printAliases(KeyStore ks) throws KeyStoreException {
+		List<String> aliases = new ArrayList<String>(ks.size());
+		Enumeration<String> e = ks.aliases();
+		while (e.hasMoreElements()) {
+			aliases.add(e.nextElement());
+		}
+		logger.info("Loaded keystore aliases : " + aliases);
+	}
 
-    private void sendCommandMsg(BufferedWriter out, String sendMsg) throws IOException {
-        out.write(sendMsg);
-        out.newLine();
-        out.flush();
-    }
+	private void sendCommand(BufferedWriter out, Command cmd) throws RecoverableException, IOException {
+		try {
+			logger.info("Command sending: " + cmd);
+			String sendMsg = cmd.serializeS();
+			logger.info("Message sent : " + sendMsg);
+			sendCommandMsg(out, sendMsg);
+		} catch (JsonProcessingException e) {
+			String message = "Failed to serialize the response command. Reason : " + e.getMessage();
+			logger.warn(message, e);
+			throw new RecoverableException(message);
+		}
+	}
 
+	private void sendCommandMsg(BufferedWriter out, String sendMsg) throws IOException {
+		out.write(sendMsg);
+		out.newLine();
+		out.flush();
+	}
 
 }
