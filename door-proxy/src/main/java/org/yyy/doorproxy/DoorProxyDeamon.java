@@ -55,14 +55,14 @@ public class DoorProxyDeamon implements Runnable {
 		switch (mode) {
 		case "start":
 			log("Starting ...");
-			/*File f = createStopFile(getArg(args, 2));
-			startThread(getArg(args, 1), f);*/
-			start(args);
+			File f = createStopFile(getArg(args, 2));
+			startThread(getArg(args, 1), f);
+			//start(args);
 			break;
 		case "stop":
 			log("Stopping ...");
-			//deleteStopFile(getArg(args, 1));
-			stop(args);
+			deleteStopFile(getArg(args, 1));
+			//stop(args);
 			break;
 		default:
 			printUsage();
@@ -121,7 +121,7 @@ public class DoorProxyDeamon implements Runnable {
 		}
 		log("Starting the service thread, wait(seconds): " + wait);
 		thrd = new Thread(new DoorProxyDeamon(wait * MS_PER_SEC, f), "DoorProxyDeamon");
-		//thrd.setContextClassLoader(Thread.currentThread().getContextClassLoader());
+		//thrd.setContextClassLoader(DoorProxyDeamon.class.getClassLoader());
 		thrd.start();
 	}
 

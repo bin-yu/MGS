@@ -1,8 +1,8 @@
 1. How to install mgs-server as Linux service:
 1) ln -s /usr/local/mgs/mgs.jar /etc/init.d/mgs
 2) vi mgs.conf
-	JAVA_HOME=/usr/local/java/jdk1.8.0_152/jre
-	JAVA_OPTS=-Dspring.profiles.active=alpha
+	JAVA_HOME=/usr/local/java/jdk1.8.0_152
+	JAVA_OPTS="-Dspring.profiles.active=alpha -Djava.security.egd=file:/dev/./urandom"
 3) update-rc.d mgs defaults 99
 4) service mgs start
 5) systemctl status mgs.service
