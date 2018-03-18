@@ -13,7 +13,7 @@ import com.yyy.server.door.repo.Door;
 
 public class ProxiedTcpFC8800 extends AbstractFC8800 {
 	@Autowired
-	private DoorCommandProxy proxy;
+	private DoorProxyFacade proxy;
 	private Door door;
 	private DoorResponseCommand resp;
 	private int readPos = 0;

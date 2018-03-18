@@ -1,8 +1,9 @@
 proxy:
   doorSecrets: AAA,BBB,TEST
-  reconnect.delayInSecs: 600
+  reconnect.delayInSecs: 60
+  keepAliveInSecs: 300
   server:
-    host: www.mgssys.xyz
+    host: localhost
     port: 8443
   trustStore:
     path: ${keystore.path}

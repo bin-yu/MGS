@@ -1,3 +1,6 @@
 proxy:
   doorSecrets: AAA,BBB,TEST
   reconnect.delayInSecs: 60
+  server:
+    host: www.mgssys.xyz
+    port: 8443

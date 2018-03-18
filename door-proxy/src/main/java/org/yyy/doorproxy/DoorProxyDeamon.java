@@ -121,6 +121,7 @@ public class DoorProxyDeamon implements Runnable {
 		}
 		log("Starting the service thread, wait(seconds): " + wait);
 		thrd = new Thread(new DoorProxyDeamon(wait * MS_PER_SEC, f), "DoorProxyDeamon");
+		//thrd.setContextClassLoader(Thread.currentThread().getContextClassLoader());
 		thrd.start();
 	}
 

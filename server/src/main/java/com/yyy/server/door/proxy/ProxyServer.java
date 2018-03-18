@@ -49,7 +49,7 @@ public class ProxyServer {
 	private static final String KEYSTORE = "/keystore.jks";
 	private Logger logger = LoggerFactory.getLogger(ProxyServer.class);
 	@Autowired
-	private DoorCommandProxy doorProxy;
+	private DoorProxyFacade doorProxyFac;
 	@Value("${mgs.door.proxy-server.accept-thread-cnt}")
 	private int acceptThreadCnt;
 	@Value("${mgs.door.proxy-server.port}")
@@ -183,7 +183,7 @@ public class ProxyServer {
 					sc=serverSock.accept();
 					proxyConnectionRegPool.execute(()->{
 						try {
-							registerSocket(sc);
+							doorProxyFac.registerProxySocket(sc);
 						} catch (Throwable t) {
 							logger.warn("Failed to register proxy connection!", t);
 							closeSocket(sc);
@@ -275,23 +275,6 @@ public class ProxyServer {
 		
 
 	}*/
-	private void registerSocket(Socket s) throws IOException {
-		SocketAddress remoteSocketAddress = s.getRemoteSocketAddress();
-		logger.info("Registering proxy connection :" + remoteSocketAddress);
-		BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream(), "UTF-8"));
-		String msgBody = in.readLine();
-		logger.info("Message received : " + msgBody);
-		Command cmd = Command.deserializeS(msgBody);
-		logger.info("Command : " + cmd.toString());
-		if (cmd instanceof RegisterCommand) {
-			s.setKeepAlive(true);
-			doorProxy.registerDoors(s, ((RegisterCommand) cmd).getSecrets());
-			logger.info("Registered door secrets " + Arrays.toString(((RegisterCommand) cmd).getSecrets())
-					+ " to proxy connection " + remoteSocketAddress);
-		} else {
-			logger.info("Closing connection : " + remoteSocketAddress);
-			closeSocket(s);
-		}
-	}
+	
 
 }

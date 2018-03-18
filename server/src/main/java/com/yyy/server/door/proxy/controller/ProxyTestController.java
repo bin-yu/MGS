@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.yyy.proxy.common.Command;
 import com.yyy.proxy.common.server.DoorRequestCommand;
 import com.yyy.server.door.proxy.DoorCommandException;
-import com.yyy.server.door.proxy.DoorCommandProxy;
+import com.yyy.server.door.proxy.DoorProxyFacade;
 
 @RestController
 @RequestMapping({ "/doorproxy" })
 public class ProxyTestController {
 	@Autowired
-	private DoorCommandProxy proxy;
+	private DoorProxyFacade proxy;
 
 	@PostMapping("/command")
 	public Command execCommand(String ip, int port, String secret, String protocol,String command)

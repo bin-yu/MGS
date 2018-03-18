@@ -17,7 +17,10 @@ mgs:
   door:
     proxy-server:
       port: 8443
-      accept-thread-cnt: 20
+      accept-thread-cnt: 1
+      read-timeout-secs: 60
+      listener-thread-cnt: 10
+      keep-alive-secs: 300
       keystore:
         password: changeme
     

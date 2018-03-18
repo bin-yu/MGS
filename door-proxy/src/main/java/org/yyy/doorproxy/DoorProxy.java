@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -15,6 +16,7 @@ import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.function.Function;
@@ -47,7 +49,11 @@ public class DoorProxy implements Runnable {
 	private static Logger logger = LoggerFactory.getLogger(DoorProxy.class);
 
 	@Value("${proxy.reconnect.delayInSecs}")
-	private int reconDelaySecs = 60 * 1000;
+	private int reconDelaySecs = 120;
+
+	@Value("${proxy.keepAliveInSecs}")
+	private int keepAliveInSecs = 120;
+
 	@Value("${proxy.server.host}")
 	private String host;
 	@Value("${proxy.server.port}")
@@ -62,12 +68,19 @@ public class DoorProxy implements Runnable {
 
 	private SSLSocketFactory ssf;
 	SSLSocket socket;
+	BufferedWriter socketOut;
 
 	@Autowired
-	private Function<String, CommandExecutor> executorFac;
+	Function<String, CommandExecutor> executorFac;
 
 	private Thread t;
+
+	private DoorCommandReceiver receiver;
+
 	private volatile boolean isRunning = true;
+	private volatile boolean sendKeepAlive = true;
+
+	private volatile boolean reconnectSignaled = false;
 
 	@PostConstruct
 	public void prepareSocketFactory() {
@@ -89,12 +102,16 @@ public class DoorProxy implements Runnable {
 	public void start() {
 		logger.info("Starting DoorProxy Listener...");
 		t = new Thread(this, "DoorProxy Listener");
+		//t.setContextClassLoader(Thread.currentThread().getContextClassLoader());
 		t.setDaemon(true);
 		t.start();
 	}
 
 	@PreDestroy
 	public void stop() throws InterruptedException, IOException {
+		if (receiver != null) {
+			receiver.stop();
+		}
 		if (t != null) {
 			logger.info("Stopping DoorProxy Listener...");
 			isRunning = false;
@@ -106,6 +123,10 @@ public class DoorProxy implements Runnable {
 		}
 	}
 
+	public BufferedReader getSocketReader() throws UnsupportedEncodingException, IOException {
+		return new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
+	}
+
 	@Override
 	public void run() {
 		try {
@@ -113,30 +134,33 @@ public class DoorProxy implements Runnable {
 				logger.info("Connecting to " + host + ":" + port + "...");
 				try (SSLSocket s = (SSLSocket) ssf.createSocket(host, port)) {
 					logger.info("Connected!");
-					this.socket = s;
+					initConnection(s);
 					try (BufferedWriter out = new BufferedWriter(
 							new OutputStreamWriter(s.getOutputStream(), "UTF-8"))) {
+						this.socketOut = out;
 						logger.info("Registering doors : " + secrets);
-						sendCommand(out, new RegisterCommand(secrets.split(",")));
-
-						try (BufferedReader in = new BufferedReader(
-								new InputStreamReader(s.getInputStream(), "UTF-8"))) {
-							while (true) {
-								DoorRequestCommand cmd = null;
-								try {
-									cmd = receiveCommand(in);
-									Command respCmd = executorFac.apply(cmd.getProtocol()).execute(cmd);
-									sendCommand(out, respCmd);
-								} catch (RecoverableException e) {
-									// send error response
-									logger.info("Sending Error Response : " + e.getMessage());
-									String secret = secrets;
-									if (cmd != null) {
-										secret = cmd.getSecret();
-									}
-									ErrorResponseCommand respCmd = new ErrorResponseCommand(secret, e.getMessage());
-									sendCommand(out, respCmd);
+						String[] secretArray = secrets.split(",");
+						RegisterCommand registerCmd = new RegisterCommand(secretArray);
+						sendCommand(registerCmd);
+						receiver = new DoorCommandReceiver(this);
+						receiver.start();
+						while (isRunning) {
+							try {
+								Thread.sleep(keepAliveInSecs * 1000);
+							} catch (InterruptedException e) {
+								if (reconnectSignaled) {
+									// interrupted by receiver: signal me to
+									// reconnect
+									break;
+								} else {
+									// interrupted by service stop
+									throw e;
 								}
+							}
+							if (this.sendKeepAlive) {
+								sendCommand(registerCmd);
+							} else {
+								logger.info("Ignoring sending keepalive while executing command.");
 							}
 						}
 					}
@@ -158,25 +182,11 @@ public class DoorProxy implements Runnable {
 		}
 	}
 
-	private DoorRequestCommand receiveCommand(BufferedReader in) throws RecoverableException, IOException {
-		String msg = in.readLine();
-		logger.info("Message received : " + msg);
-		if (msg == null) {
-			logger.info("Received null message, the connection may be disconnected!");
-			throw new IOException("Connection is disconnected!");
-		}
-		try {
-			Command cmd = Command.deserializeS(msg);
-			logger.info("Command received : " + cmd);
-			if (!(cmd instanceof DoorRequestCommand)) {
-				throw new RecoverableException("Unexpected command type:" + cmd.getClass().getSimpleName());
-			}
-			return (DoorRequestCommand) cmd;
-		} catch (IOException e) {
-			String message = "Failed to deserialize the request command. Reason : " + e.getMessage();
-			logger.warn(message, e);
-			throw new RecoverableException(message);
-		}
+	private void initConnection(SSLSocket s) {
+		isRunning = true;
+		reconnectSignaled = false;
+		sendKeepAlive = true;
+		this.socket = s;
 	}
 
 	private TrustManager[] getTrustManagers(KeyStore ks) {
@@ -215,12 +225,12 @@ public class DoorProxy implements Runnable {
 		logger.info("Loaded keystore aliases : " + aliases);
 	}
 
-	private void sendCommand(BufferedWriter out, Command cmd) throws RecoverableException, IOException {
+	public synchronized void sendCommand(Command cmd) throws RecoverableException, IOException {
 		try {
 			logger.info("Command sending: " + cmd);
 			String sendMsg = cmd.serializeS();
 			logger.info("Message sent : " + sendMsg);
-			sendCommandMsg(out, sendMsg);
+			sendCommandMsg(this.socketOut, sendMsg);
 		} catch (JsonProcessingException e) {
 			String message = "Failed to serialize the response command. Reason : " + e.getMessage();
 			logger.warn(message, e);
@@ -232,6 +242,19 @@ public class DoorProxy implements Runnable {
 		out.write(sendMsg);
 		out.newLine();
 		out.flush();
+	}
+
+	public void beginExec() {
+		this.sendKeepAlive = false;
+	}
+
+	public void endExec() {
+		this.sendKeepAlive = true;
+	}
+
+	public void signalReconnect() {
+		this.reconnectSignaled = true;
+		this.t.interrupt();
 	}
 
 }
