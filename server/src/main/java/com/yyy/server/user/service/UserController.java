@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.yyy.server.domain.repo.Domain;
+import com.yyy.server.security.auth.EncryptionUtil;
 import com.yyy.server.user.repo.User;
 import com.yyy.server.user.repo.UserRepo;
 
@@ -23,6 +24,8 @@ import com.yyy.server.user.repo.UserRepo;
 public class UserController {
 	@Autowired
 	private UserRepo repo;
+	@Autowired
+	private EncryptionUtil util;
 
 	@GetMapping
 	public Page<User> getUsers(@PathVariable Long domainId,Pageable pageable) throws Exception {
@@ -47,6 +50,7 @@ public class UserController {
 	@PostMapping()
 	public User addUser(@PathVariable Long domainId,@RequestBody User user) {
 		user.setDomain(new Domain(domainId));
+		user.setPassword(util.encryptHMAC(user.getPassword()));
 		return repo.save(user);
 	}
 
@@ -56,6 +60,7 @@ public class UserController {
 			throw new IllegalArgumentException("Mismatched id between path variable and request body.");
 		}
 		user.setDomain(new Domain(domainId));
+		user.setPassword(util.encryptHMAC(user.getPassword()));
 		return repo.save(user);
 	}
 

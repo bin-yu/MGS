@@ -7,6 +7,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import com.yyy.server.domain.repo.Domain;
 
 public interface UserRepo extends PagingAndSortingRepository<User, Long> {
+	User findOneByName(String name);
 	User findOneByNameAndPassword(String name, String password);
 	Page<User> findByDomain(Domain domain,Pageable pageable);
 	User getByIdAndDomain(Long id,Domain domain);
