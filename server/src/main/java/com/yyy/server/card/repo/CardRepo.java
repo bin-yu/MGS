@@ -14,5 +14,6 @@ import com.yyy.server.worker.repo.Worker;
 public interface CardRepo extends PagingAndSortingRepository<Card, CardKey> {
     Page<Card> findByDoorId(long doorId, Pageable pagable);
 
+    Page<Card> findByDoorIdAndWorker_NameLike(long doorId, String nameLike, Pageable pageable);
     List<Card> findByWorker(Worker worker);
 }

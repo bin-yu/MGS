@@ -101,6 +101,12 @@ public class DoorController {
 		return cardRepo.findByDoorId(door.getId(), pageable);
 	}
 
+    @GetMapping("/{did}/cards/search")
+    public Page<Card> findCardsByWorkerNameLike(@PathVariable Long domainId, @PathVariable Long did, @RequestParam() String workerNameLike, Pageable pageable) throws Exception {
+        Door door = this.getDoor(domainId, did);
+        return cardRepo.findByDoorIdAndWorker_NameLike(door.getId(), workerNameLike, pageable);
+    }
+
 	@GetMapping("/{did}/cards/{cid}/cardData")
 	public CardData readCard(@PathVariable Long domainId, @PathVariable Long did, @PathVariable Long cid)
 			throws IOException {

@@ -55,6 +55,8 @@ public class Worker implements Serializable {
     @JsonIgnore()
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	private Domain domain;
+    @Column(nullable = false, columnDefinition = "INTEGER DEFAULT 0")
+    private int score = 0;
 
 
     @JsonIgnore
@@ -151,14 +153,12 @@ public class Worker implements Serializable {
 	}
     @JsonGetter
     public int getScore() {
-        int total = 0;
-        if (this.getIncidents() == null) {
-            return total;
-        }
-        for (Incident inc : this.getIncidents()) {
-            total += inc.calScore();
-        }
-        return total;
+        return score;
+    }
+
+    @JsonIgnore
+    public void setScore(int score) {
+        this.score = score;
     }
 
     @JsonGetter
