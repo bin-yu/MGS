@@ -241,6 +241,7 @@ public class DoorProxy implements Runnable {
 	private void sendCommandMsg(BufferedWriter out, String sendMsg) throws IOException {
 		out.write(sendMsg);
 		out.newLine();
+		out.newLine();
 		out.flush();
 	}
 

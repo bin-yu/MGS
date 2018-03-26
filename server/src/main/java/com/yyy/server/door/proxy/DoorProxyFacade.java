@@ -24,7 +24,7 @@ import com.yyy.proxy.common.server.DoorRequestCommand;
 @Service
 public class DoorProxyFacade {
 	private static Logger logger = LoggerFactory.getLogger(DoorProxyFacade.class);
-	private static Map<String, DoorProxyStub> doorProxyMap = new ConcurrentHashMap<String, DoorProxyStub>();
+	private static Map<String, DoorProxy> doorProxyMap = new ConcurrentHashMap<String, DoorProxy>();
 	@Value("${mgs.door.proxy-server.read-timeout-secs}")
 	private int readTimeout;
 	@Value("${mgs.door.proxy-server.listener-thread-cnt}")
@@ -66,19 +66,19 @@ public class DoorProxyFacade {
 		new DoorProxyStub(this, s, readTimeout * 1000).start();
 	}
 
-	void registerDoors(DoorProxyStub proxy, String[] secrets) {
+	public void registerDoors(DoorProxy proxy, String[] secrets) {
 		for (String secret : secrets) {
-			DoorProxyStub oldProxy = doorProxyMap.put(secret, proxy);
+			DoorProxy oldProxy = doorProxyMap.put(secret, proxy);
 			if (oldProxy != null) {
 				logger.info("Replacing old proxy connection for door secret :" + secret + "...");
 			}
 		}
 	}
 
-	void unRegisterDoors(DoorProxyStub proxy, String[] secrets) {
+	void unRegisterDoors(DoorProxy proxy, String[] secrets) {
 		for (String secret : secrets) {
 			if (proxy == doorProxyMap.get(secret)) {
-				DoorProxyStub oldProxy = doorProxyMap.remove(secret);
+				DoorProxy oldProxy = doorProxyMap.remove(secret);
 				if (oldProxy != null) {
 					logger.info("Unregister old proxy connection for door secret :" + secret + "...");
 				}
@@ -88,13 +88,13 @@ public class DoorProxyFacade {
 
 	public DoorResponseCommand sendCommand(String doorSecret, DoorRequestCommand cmd) throws DoorCommandException {
 
-		DoorProxyStub proxy = getDoorConnection(doorSecret);
+		DoorProxy proxy = getDoorConnection(doorSecret);
 		return proxy.sendCommand(cmd);
 
 	}
 
-	public DoorProxyStub getDoorConnection(String doorSecret) throws DoorCommandException {
-		DoorProxyStub proxy = doorProxyMap.get(doorSecret);
+	public DoorProxy getDoorConnection(String doorSecret) throws DoorCommandException {
+		DoorProxy proxy = doorProxyMap.get(doorSecret);
 
 		if (proxy == null) {
 			throw new DoorCommandException("Door proxy not connected! secret = " + doorSecret);

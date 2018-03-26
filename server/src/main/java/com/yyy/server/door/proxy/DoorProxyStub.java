@@ -22,7 +22,7 @@ import com.yyy.proxy.common.client.DoorResponseCommand;
 import com.yyy.proxy.common.client.RegisterCommand;
 import com.yyy.proxy.common.server.DoorRequestCommand;
 
-public class DoorProxyStub {
+public class DoorProxyStub implements DoorProxy{
 
 	private static Logger logger = LoggerFactory.getLogger(DoorProxyStub.class);
 

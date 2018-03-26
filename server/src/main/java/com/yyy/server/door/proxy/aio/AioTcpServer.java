@@ -2,8 +2,10 @@ package com.yyy.server.door.proxy.aio;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousChannelGroup;
 import java.nio.channels.AsynchronousServerSocketChannel;
+import java.nio.channels.AsynchronousSocketChannel;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -47,8 +49,8 @@ import com.yyy.server.door.proxy.DoorProxyFacade;
 public class AioTcpServer {
     private static final String KEYSTORE = "/keystore.jks";
     private Logger logger = LoggerFactory.getLogger(AioTcpServer.class);
-    @Autowired
-    private DoorProxyFacade doorProxyFac;
+    @Autowired()
+    private AioConnectionHandler handler;
     @Value("${mgs.door.proxy-server.accept-thread-cnt}")
     private int acceptThreadCnt = 20;
     @Value("${mgs.door.proxy-server.port}")
@@ -56,11 +58,12 @@ public class AioTcpServer {
     @Value("${mgs.door.proxy-server.keystore.password}")
     private String ksPass = "changeme";
     private AsynchronousChannelGroup asyncChannelGroup;
-    private AsynchronousServerSocketChannel listener;
-    private SSLEngine sslEngine;
+    private AsynchronousServerSocketChannel ssc;
+	private SSLContext sslContext;
 
     @PostConstruct
     public void init() throws Exception {
+    	initSSLContext();
         //创建线程池
         ExecutorService executor = Executors.newFixedThreadPool(acceptThreadCnt);
         //异步通道管理器
@@ -68,28 +71,25 @@ public class AioTcpServer {
         //创建 用在服务端的异步Socket.以下简称服务器socket。
         //异步通道管理器，会把服务端所用到的相关参数
         InetSocketAddress addr = new InetSocketAddress(port);
-        listener = AsynchronousServerSocketChannel.open(asyncChannelGroup).bind(addr);
+        ssc = AsynchronousServerSocketChannel.open(asyncChannelGroup).bind(addr);
         //为服务端socket指定接收操作对象.accept原型是：
         //accept(A attachment, CompletionHandler<AsynchronousSocketChannel, ? super A> handler)
         //也就是这里的CompletionHandler的A型参数是实际调用accept方法的第一个参数
         //即是listener。另一个参数V，就是原型中的客户端socket
         logger.info("Start listening to " + addr);
-        listener.accept(listener, new AioAcceptHandler(initSSLContext()));
-
-
+        ssc.accept(ssc, new AioAcceptHandler(this));
     }
 
-    private SSLContext initSSLContext() throws NoSuchAlgorithmException, KeyStoreException, IOException, CertificateException, UnrecoverableKeyException, Exception,
+    private void initSSLContext() throws NoSuchAlgorithmException, KeyStoreException, IOException, CertificateException, UnrecoverableKeyException, Exception,
                                     KeyManagementException {
-        logger.info("Creating SSL Context...");
-        SSLContext sc = SSLContext.getInstance("TLSv1.2");
+        logger.info("Initiating SSL Context...");
+        sslContext = SSLContext.getInstance("TLSv1.2");
         SecureRandom rand = new SecureRandom();
         KeyStore ks = loadKeystore();
         KeyManager[] km = getKeyManagers(ks);
         TrustManager[] tm = getTrustManagers(ks);
-        sc.init(km, tm, rand);
+        sslContext.init(km, tm, rand);
         logger.info("SSL Context initialized.");
-        return sc;
     }
 
     private KeyManager[] getKeyManagers(KeyStore ks) throws NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, CertificateException, IOException {
@@ -117,4 +117,12 @@ public class AioTcpServer {
         server.init();
         System.in.read();
     }
+
+	public void startNewConnection(AsynchronousSocketChannel socket) throws Exception {
+
+        AsynSSLSocketChannel sc = new AsynSSLSocketChannel(this.sslContext, socket);
+        // 开始读客户端
+        handler.startNewConnection(sc);
+	}
+
 }
