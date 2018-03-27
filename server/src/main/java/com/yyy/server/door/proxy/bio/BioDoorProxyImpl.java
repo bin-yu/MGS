@@ -1,4 +1,4 @@
-package com.yyy.server.door.proxy;
+package com.yyy.server.door.proxy.bio;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -21,10 +21,12 @@ import com.yyy.proxy.common.Command;
 import com.yyy.proxy.common.client.DoorResponseCommand;
 import com.yyy.proxy.common.client.RegisterCommand;
 import com.yyy.proxy.common.server.DoorRequestCommand;
+import com.yyy.server.door.proxy.DoorCommandException;
+import com.yyy.server.door.proxy.DoorProxy;
 
-public class DoorProxyStub implements DoorProxy{
+public class BioDoorProxyImpl implements DoorProxy {
 
-	private static Logger logger = LoggerFactory.getLogger(DoorProxyStub.class);
+	private static Logger logger = LoggerFactory.getLogger(BioDoorProxyImpl.class);
 
 	private Socket s;
 
@@ -45,7 +47,7 @@ public class DoorProxyStub implements DoorProxy{
 
 	private final int soTimeout;
 
-	public DoorProxyStub(BioDoorProxyFacade proxyFacade, Socket s, int soTimeout) {
+	public BioDoorProxyImpl(BioDoorProxyFacade proxyFacade, Socket s, int soTimeout) {
 		super();
 		this.s = s;
 		this.proxyFacade = proxyFacade;
@@ -116,6 +118,7 @@ public class DoorProxyStub implements DoorProxy{
 	private synchronized Command doReceive(int timeout) {
 		Command cmd;
 		try {
+			s.setSoTimeout(timeout);
 			cmd = this._receiveResp();
 			if (cmd instanceof RegisterCommand) {
 				if (secrets == null) {
@@ -138,11 +141,20 @@ public class DoorProxyStub implements DoorProxy{
 
 	private Command _receiveResp() throws IOException {
 		logInfo("Receiving message...");
-		String msg = in.readLine();
-		logInfo("Message received : " + msg);
-		if (msg == null) {
-			return null;
+		String msg = null;
+		while (true) {
+			msg = in.readLine();
+			if (msg == null) {
+				//the end of the stream has been reached 
+				return null;
+			}
+			msg = msg.trim();
+			if (msg.length() > 0) {
+				break;
+			}
+			//continue to read if any empty line was read.
 		}
+		logInfo("Message received : " + msg);
 		Command resp = null;
 		try {
 			resp = Command.deserializeS(msg);

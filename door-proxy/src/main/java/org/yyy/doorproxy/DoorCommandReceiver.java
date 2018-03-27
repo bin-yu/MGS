@@ -24,20 +24,23 @@ public class DoorCommandReceiver implements Runnable {
 		this.proxy = proxy;
 		this.executorFac = proxy.executorFac;
 	}
+
 	public void start() {
 		logger.info("Starting DoorProxy Receiver...");
 		t = new Thread(this, "DoorProxy Receiver");
 		t.setDaemon(true);
 		t.start();
 	}
+
 	public void stop() throws InterruptedException, IOException {
 		if (t != null) {
 			logger.info("Stopping DoorProxy Receiver...");
-			isRunning  = false;
+			isRunning = false;
 			t.interrupt();
 			t.join(500);
 		}
 	}
+
 	@Override
 	public void run() {
 		try (BufferedReader in = proxy.getSocketReader()) {
@@ -57,27 +60,35 @@ public class DoorCommandReceiver implements Runnable {
 					}
 					ErrorResponseCommand respCmd = new ErrorResponseCommand(secret, e.getMessage());
 					proxy.sendCommand(respCmd);
-				} finally{
+				} finally {
 					proxy.endExec();
 				}
 			}
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
 		} catch (IOException e) {
-			logger.info("DoorProxy Receiver encounters IO Error!",e);
-		} finally{
+			logger.info("DoorProxy Receiver encounters IO Error!", e);
+		} finally {
 			logger.info("DoorProxy Receiver stopped.");
 			proxy.signalReconnect();
 		}
 	}
 
 	private DoorRequestCommand receiveCommand(BufferedReader in) throws RecoverableException, IOException {
-		String msg = in.readLine();
-		logger.info("Message received : " + msg);
-		if (msg == null) {
-			logger.info("Received null message, the connection may be disconnected!");
-			throw new IOException("Connection is disconnected!");
+		String msg = null;
+		while (true) {
+			msg = in.readLine();
+			if (msg == null) {
+				logger.info("Received null message, the connection may be disconnected!");
+				throw new IOException("Connection is disconnected!");
+			}
+			msg=msg.trim();
+			if(msg.length()>0){
+				//non-empty message body
+				break;
+			}
 		}
+		logger.info("Message received : " + msg);
 		try {
 			Command cmd = Command.deserializeS(msg);
 			logger.info("Command received : " + cmd);

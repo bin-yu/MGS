@@ -1,16 +1,8 @@
-package com.yyy.server.door.proxy;
+package com.yyy.server.door.proxy.bio;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketAddress;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -18,9 +10,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -39,15 +28,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import com.yyy.proxy.common.Command;
-import com.yyy.proxy.common.client.RegisterCommand;
-
 @Service
-public class ProxyServer {
+@Lazy
+public class BioTcpServer {
 	private static final String KEYSTORE = "/keystore.jks";
-	private Logger logger = LoggerFactory.getLogger(ProxyServer.class);
+	private Logger logger = LoggerFactory.getLogger(BioTcpServer.class);
 	@Autowired
 	private BioDoorProxyFacade doorProxyFac;
 	@Value("${mgs.door.proxy-server.accept-thread-cnt}")
@@ -59,7 +47,6 @@ public class ProxyServer {
 	private Thread acceptThread;
 	private volatile boolean isRunning = true;
 
-	@PostConstruct
 	public void start() throws Exception {
 		SSLContext sc = initSSLContext();
 		SSLServerSocketFactory ssf = sc.getServerSocketFactory();
@@ -70,50 +57,6 @@ public class ProxyServer {
 		acceptThread = new Thread(new BIOAcceptRunnable(serverSocket),"Proxy Acceptor Thread");
 		acceptThread.setDaemon(true);
 		acceptThread.start();
-		
-		/*
-		
-		// Selector for incoming time requests
-		Selector acceptSelector = SelectorProvider.provider().openSelector();
-
-		// Create a new server socket and set to non blocking mode
-		ServerSocketChannel ssc = ServerSocketChannel.open();
-		ssc.configureBlocking(false);
-		
-
-		// Bind the server socket to the local host and port
-		InetAddress lh = InetAddress.getLocalHost();
-		logger.info("Listening to " + lh.toString() + ":" + port + "...");
-		InetSocketAddress isa = new InetSocketAddress(lh, port);
-		ssc.socket().bind(isa);
-
-		// Register accepts on the server socket with the selector. This
-		// step tells the selector that the socket wants to be put on the
-		// ready list when accept operations occur, so allowing multiplexed
-		// non-blocking I/O to take place.
-		SelectionKey acceptKey = ssc.register(acceptSelector, SelectionKey.OP_ACCEPT);
-
-		pool = Executors.newFixedThreadPool(1, new ThreadFactory() {
-
-			@Override
-			public Thread newThread(Runnable r) {
-
-				return new Thread(r, "Proxy Connection Acceptor");
-			}
-
-		});
-		pool.execute(new AcceptorRunnable(acceptSelector, acceptThreadCnt));*/
-
-		/*
-		 * try { ExecutorService executor =
-		 * Executors.newFixedThreadPool(threadCnt); AsynchronousChannelGroup
-		 * asyncChannelGroup =
-		 * AsynchronousChannelGroup.withThreadPool(executor); listener =
-		 * AsynchronousServerSocketChannel.open(asyncChannelGroup).bind(new
-		 * InetSocketAddress(port), 100); listener.accept(listener, new
-		 * ProxyAcceptHandler()); } catch (IOException e) {
-		 * logger.warn("Failed to start door proxy server!!!", e); }
-		 */
 	}
     private SSLContext initSSLContext() throws NoSuchAlgorithmException, KeyStoreException, IOException, CertificateException, UnrecoverableKeyException, Exception,
                                     KeyManagementException {
@@ -143,7 +86,6 @@ public class ProxyServer {
 		return tmf.getTrustManagers();
 	}
 
-	@PreDestroy
 	public void stop() throws InterruptedException{
 		isRunning = false;
 		acceptThread.interrupt();
@@ -173,8 +115,9 @@ public class ProxyServer {
 
 				@Override
 				public Thread newThread(Runnable r) {
-
-					return new Thread(r, "Proxy Connection Register");
+					Thread t = new Thread(r, "Proxy Connection Register");
+					t.setDaemon(true);
+					return t;
 				}
 
 			});

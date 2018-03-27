@@ -16,11 +16,13 @@ mgs:
       interval-hours: 1
   door:
     proxy-server:
+      aio:
+        handler-thread-cnt: 10
       io-mode: AIO
       port: 8443
       accept-thread-cnt: 1
       read-timeout-secs: 10
-      read-timeout-secs: 10
+      write-timeout-secs: 10
       listener-thread-cnt: 10
       keep-alive-secs: 300
       keystore:

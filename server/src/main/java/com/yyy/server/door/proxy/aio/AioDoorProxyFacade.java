@@ -4,8 +4,12 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.yyy.server.door.proxy.DoorCommandException;
@@ -20,6 +24,16 @@ public class AioDoorProxyFacade implements DoorProxyFacade, AioConnectionHandler
     private int readTimeout;
     @Value("${mgs.door.proxy-server.write-timeout-secs}")
     private int writeTimeout;
+    @Autowired
+    private AioTcpServer aioServer;
+    @PostConstruct
+    public void start() throws Exception{
+    	aioServer.start();
+    }
+    @PreDestroy
+    public void stop(){
+    	aioServer.stop();
+    }
 	@Override
     public void handleNewConnection(AsynchronousSocketChannel sc) {
         AioDoorProxyImpl doorProxy = new AioDoorProxyImpl(this, sc);

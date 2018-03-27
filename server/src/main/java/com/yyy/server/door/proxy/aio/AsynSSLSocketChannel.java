@@ -95,7 +95,7 @@ public class AsynSSLSocketChannel extends AsynchronousSocketChannel {
 				// information
 				if (peerNetData.position() == 0) {
 					int cnt = sslEngine.isInboundDone() ? -1 : socket.read(peerNetData).get();
-					logInfo("Bytes received:" + cnt);
+					logDebug("Bytes received:" + cnt);
 				}
 				hsStatus = sslUnwrap();
 				break;
@@ -158,19 +158,18 @@ public class AsynSSLSocketChannel extends AsynchronousSocketChannel {
 			count = socket.write(myNetData).get();
 			countOut += count;
 		}
-		logInfo("Bytes sent : " + countOut);
+		logDebug("Bytes sent : " + countOut);
 		myNetData.compact();
 	}
 
 	private HandshakeStatus doTask() {
 		Runnable runnable;
 		while ((runnable = sslEngine.getDelegatedTask()) != null) {
-			logInfo("running delegated task...");
+			logDebug("running delegated task...");
 			runnable.run();
 		}
 		return sslEngine.getHandshakeStatus();
 	}
-
 
 	/*
 	 * Begin the shutdown process. <P> Close out the SSLEngine if not already
@@ -202,6 +201,9 @@ public class AsynSSLSocketChannel extends AsynchronousSocketChannel {
 
 	private void logInfo(String msg) {
 		logger.info("[" + getRemoteAddr() + "] " + msg);
+	}
+	private void logDebug(String msg) {
+		logger.debug("[" + getRemoteAddr() + "] " + msg);
 	}
 
 	private void logWarn(String msg, Throwable e) {
@@ -316,7 +318,63 @@ public class AsynSSLSocketChannel extends AsynchronousSocketChannel {
 
 	@Override
 	public Future<Integer> read(ByteBuffer dst) {
-		throw new RuntimeException("Not implemented yet!");
+		peerAppData.clear();
+
+		Future<Integer> inFuture = socket.read(peerNetData);
+		return new Future<Integer>() {
+
+			@Override
+			public boolean cancel(boolean mayInterruptIfRunning) {
+				return inFuture.cancel(mayInterruptIfRunning);
+			}
+
+			@Override
+			public boolean isCancelled() {
+				return inFuture.isCancelled();
+			}
+
+			@Override
+			public boolean isDone() {
+				return inFuture.isDone();
+			}
+
+			@Override
+			public Integer get() throws InterruptedException, ExecutionException {
+				Integer cnt = inFuture.get();
+				return unwrapData(dst, cnt);
+			}
+
+			private Integer unwrapData(ByteBuffer dst, Integer cnt) {
+				try {
+					if (cnt == -1) {
+						sslEngine.closeInbound();
+						return cnt;
+					}
+					peerNetData.flip();
+					SSLEngineResult result;
+					result = sslEngine.unwrap(peerNetData, peerAppData);
+
+					peerNetData.compact();
+					// Process the engineResult.Status
+					handleErrorStatus(result);
+					peerAppData.flip();
+					cnt = peerAppData.limit();
+					dst.put(peerAppData);
+					return cnt;
+				} catch (IOException e) {
+					logWarn("Failed to unwrap the data",e);
+					return -1;
+				}
+			}
+
+			@Override
+			public Integer get(long timeout, TimeUnit unit)
+					throws InterruptedException, ExecutionException, TimeoutException {
+				Integer cnt = inFuture.get(timeout, unit);
+				return unwrapData(dst, cnt);
+			}
+
+		};
 	}
 
 	@Override
@@ -329,12 +387,12 @@ public class AsynSSLSocketChannel extends AsynchronousSocketChannel {
 	public <A> void write(ByteBuffer buffer, long timeout, TimeUnit unit, A attachment,
 			CompletionHandler<Integer, ? super A> handler) {
 		myAppData.put(buffer);
-        try {
+		try {
 			this.sslWrap(true);
 			myNetData.flip();
 
 			if (myNetData.hasRemaining()) {
-				socket.write(myNetData,timeout,unit,attachment,handler);
+				socket.write(myNetData, timeout, unit, attachment, handler);
 				myNetData.compact();
 			}
 		} catch (IOException e) {
@@ -344,8 +402,8 @@ public class AsynSSLSocketChannel extends AsynchronousSocketChannel {
 
 	@Override
 	public Future<Integer> write(ByteBuffer buffer) {
-        myAppData.put(buffer);
-        try {
+		myAppData.put(buffer);
+		try {
 			this.sslWrap(true);
 			myNetData.flip();
 

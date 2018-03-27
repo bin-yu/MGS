@@ -14,6 +14,8 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.net.ssl.KeyManager;
@@ -26,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 /**
@@ -42,12 +45,13 @@ import org.springframework.stereotype.Service;
  * 
  */
 @Service
+@Lazy
 public class AioTcpServer {
     private static final String KEYSTORE = "/keystore.jks";
     private Logger logger = LoggerFactory.getLogger(AioTcpServer.class);
     @Autowired()
     private AioConnectionHandler handler;
-    @Value("${mgs.door.proxy-server.accept-thread-cnt}")
+    @Value("${mgs.door.proxy-server.aio.handler-thread-cnt}")
     private int acceptThreadCnt = 20;
     @Value("${mgs.door.proxy-server.port}")
     private int port = 8443;
@@ -57,11 +61,19 @@ public class AioTcpServer {
     private AsynchronousServerSocketChannel ssc;
 	private SSLContext sslContext;
 
-    @PostConstruct
-    public void init() throws Exception {
+    public void start() throws Exception {
     	initSSLContext();
         //创建线程池
-        ExecutorService executor = Executors.newFixedThreadPool(acceptThreadCnt);
+        ExecutorService executor = Executors.newFixedThreadPool(acceptThreadCnt,new ThreadFactory() {
+
+			@Override
+			public Thread newThread(Runnable r) {
+				Thread t = new Thread(r, "Async Proxy Connection Handler Pool");
+				t.setDaemon(true);
+				return t;
+			}
+
+		});
         //异步通道管理器
         asyncChannelGroup = AsynchronousChannelGroup.withThreadPool(executor);
         //创建 用在服务端的异步Socket.以下简称服务器socket。
@@ -74,6 +86,15 @@ public class AioTcpServer {
         //即是listener。另一个参数V，就是原型中的客户端socket
         logger.info("Start listening to " + addr);
         ssc.accept(ssc, new AioAcceptHandler(this));
+    }
+    public void stop(){
+    	try {
+			asyncChannelGroup.shutdownNow();
+	    	asyncChannelGroup.awaitTermination(5, TimeUnit.SECONDS);
+		} catch (IOException | InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     private void initSSLContext() throws NoSuchAlgorithmException, KeyStoreException, IOException, CertificateException, UnrecoverableKeyException, Exception,
@@ -110,7 +131,7 @@ public class AioTcpServer {
 
     public static void main(String[] args) throws Exception {
         AioTcpServer server = new AioTcpServer();
-        server.init();
+        server.start();
         System.in.read();
     }
 

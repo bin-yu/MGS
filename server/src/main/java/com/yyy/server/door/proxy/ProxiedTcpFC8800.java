@@ -9,11 +9,12 @@ import com.yyy.proxy.common.client.DoorResponseCommand;
 import com.yyy.proxy.common.client.ErrorResponseCommand;
 import com.yyy.proxy.common.server.DoorRequestCommand;
 import com.yyy.server.door.facade.AbstractFC8800;
+import com.yyy.server.door.proxy.bio.BioDoorProxyFacade;
 import com.yyy.server.door.repo.Door;
 
 public class ProxiedTcpFC8800 extends AbstractFC8800 {
 	@Autowired
-	private BioDoorProxyFacade proxy;
+	private DoorProxyFacade proxy;
 	private Door door;
 	private DoorResponseCommand resp;
 	private int readPos = 0;

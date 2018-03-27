@@ -117,8 +117,7 @@ public class AioDoorProxyImpl implements DoorProxy {
 
     @Override
     public boolean isClosed() {
-        // TODO Auto-generated method stub
-        return false;
+        return !sc.isOpen();
     }
 
     public void start() {

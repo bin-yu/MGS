@@ -12,11 +12,11 @@ import com.yyy.server.door.repo.Door;
 public class DoorSystemFactory {
 	@Bean
     public Function<Door, DoorSystem> doorSysFactory() {
-        return door -> createInstance(door); // or this::thing
+        return door -> doorSystem(door); // or this::thing
     } 
     @Bean
     @Scope("prototype")
-    public DoorSystem createInstance(Door door) {
+    public DoorSystem doorSystem(Door door) {
         if ("TCP".equalsIgnoreCase(door.getProtocol())) {
         	return new ProxiedTcpFC8800(door);
             //return new TcpFC8800(door.getSn(),door.getPassword(),door.getIp(), door.getPort());
