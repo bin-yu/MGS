@@ -2,7 +2,6 @@ package com.yyy.server.door.proxy.aio;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousChannelGroup;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
@@ -20,7 +19,6 @@ import javax.annotation.PostConstruct;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
@@ -29,8 +27,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import com.yyy.server.door.proxy.DoorProxyFacade;
 
 /**
  * AIO异步socket通讯，分成 用于服务端的socekt与用于客户端的socket，当然这两者都是
@@ -122,7 +118,7 @@ public class AioTcpServer {
 
         AsynSSLSocketChannel sc = new AsynSSLSocketChannel(this.sslContext, socket);
         // 开始读客户端
-        handler.startNewConnection(sc);
+        handler.handleNewConnection(sc);
 	}
 
 }

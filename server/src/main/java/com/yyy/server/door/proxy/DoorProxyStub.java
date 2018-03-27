@@ -39,13 +39,13 @@ public class DoorProxyStub implements DoorProxy{
 
 	private String remoteSocketAddress;
 
-	private DoorProxyFacade proxyFacade;
+	private BioDoorProxyFacade proxyFacade;
 
 	private boolean isClosed = false;
 
 	private final int soTimeout;
 
-	public DoorProxyStub(DoorProxyFacade proxyFacade, Socket s, int soTimeout) {
+	public DoorProxyStub(BioDoorProxyFacade proxyFacade, Socket s, int soTimeout) {
 		super();
 		this.s = s;
 		this.proxyFacade = proxyFacade;

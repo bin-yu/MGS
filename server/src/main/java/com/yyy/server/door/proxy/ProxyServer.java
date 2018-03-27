@@ -49,7 +49,7 @@ public class ProxyServer {
 	private static final String KEYSTORE = "/keystore.jks";
 	private Logger logger = LoggerFactory.getLogger(ProxyServer.class);
 	@Autowired
-	private DoorProxyFacade doorProxyFac;
+	private BioDoorProxyFacade doorProxyFac;
 	@Value("${mgs.door.proxy-server.accept-thread-cnt}")
 	private int acceptThreadCnt;
 	@Value("${mgs.door.proxy-server.port}")
@@ -61,12 +61,7 @@ public class ProxyServer {
 
 	@PostConstruct
 	public void start() throws Exception {
-		SSLContext sc = SSLContext.getInstance("TLSv1.2");
-		SecureRandom rand = new SecureRandom();
-		KeyStore ks = loadKeystore();
-		KeyManager[] km = getKeyManagers(ks);
-		TrustManager[] tm = getTrustManagers(ks);
-		sc.init(km , tm , rand );
+		SSLContext sc = initSSLContext();
 		SSLServerSocketFactory ssf = sc.getServerSocketFactory();
 		logger.info("Listening on port : "+port);
 		SSLServerSocket serverSocket = (SSLServerSocket) ssf.createServerSocket(port);
@@ -120,6 +115,16 @@ public class ProxyServer {
 		 * logger.warn("Failed to start door proxy server!!!", e); }
 		 */
 	}
+    private SSLContext initSSLContext() throws NoSuchAlgorithmException, KeyStoreException, IOException, CertificateException, UnrecoverableKeyException, Exception,
+                                    KeyManagementException {
+        SSLContext sc = SSLContext.getInstance("TLSv1.2");
+		SecureRandom rand = new SecureRandom();
+		KeyStore ks = loadKeystore();
+		KeyManager[] km = getKeyManagers(ks);
+		TrustManager[] tm = getTrustManagers(ks);
+		sc.init(km , tm , rand );
+        return sc;
+    }
 	private KeyManager[] getKeyManagers(KeyStore ks) throws NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, CertificateException, IOException {
 		KeyManagerFactory kmf=KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
 		kmf.init(ks, ksPass.toCharArray());

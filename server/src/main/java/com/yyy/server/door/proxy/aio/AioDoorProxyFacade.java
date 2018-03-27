@@ -1,29 +1,31 @@
 package com.yyy.server.door.proxy.aio;
 
-import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 
-import com.yyy.proxy.common.client.DoorResponseCommand;
-import com.yyy.proxy.common.server.DoorRequestCommand;
 import com.yyy.server.door.proxy.DoorCommandException;
 import com.yyy.server.door.proxy.DoorProxy;
+import com.yyy.server.door.proxy.DoorProxyFacade;
 
-@Service
-public class AioDoorProxyFacade implements AioConnectionHandler{
+
+public class AioDoorProxyFacade implements DoorProxyFacade, AioConnectionHandler {
 	private static Logger logger = LoggerFactory.getLogger(AioDoorProxyFacade.class);
 	private static Map<String, DoorProxy> doorProxyMap = new ConcurrentHashMap<String, DoorProxy>();
-	
+    @Value("${mgs.door.proxy-server.read-timeout-secs}")
+    private int readTimeout;
+    @Value("${mgs.door.proxy-server.write-timeout-secs}")
+    private int writeTimeout;
 	@Override
-	public void startNewConnection(AsynchronousSocketChannel sc) {
-		new AioDoorProxyImpl(this,sc).start();
-		
-		
+    public void handleNewConnection(AsynchronousSocketChannel sc) {
+        AioDoorProxyImpl doorProxy = new AioDoorProxyImpl(this, sc);
+        doorProxy.setReadTimeout(readTimeout);
+        doorProxy.setWriteTimeout(writeTimeout);
+        doorProxy.start();
 	}
 	public void registerDoors(DoorProxy proxy, String[] secrets) {
 		for (String secret : secrets) {
@@ -45,12 +47,6 @@ public class AioDoorProxyFacade implements AioConnectionHandler{
 		}
 	}
 
-	public DoorResponseCommand sendCommand(String doorSecret, DoorRequestCommand cmd) throws DoorCommandException {
-
-		DoorProxy proxy = getDoorConnection(doorSecret);
-		return proxy.sendCommand(cmd);
-
-	}
 
 	public DoorProxy getDoorConnection(String doorSecret) throws DoorCommandException {
 		DoorProxy proxy = doorProxyMap.get(doorSecret);

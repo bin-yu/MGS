@@ -16,11 +16,11 @@ import com.yyy.server.door.proxy.DoorProxyFacade;
 @RequestMapping({ "/doorproxy" })
 public class ProxyTestController {
 	@Autowired
-	private DoorProxyFacade proxy;
+    private DoorProxyFacade proxy;
 
 	@PostMapping("/command")
 	public Command execCommand(String ip, int port, String secret, String protocol,String command)
 			throws UnsupportedEncodingException, DoorCommandException {
-		return proxy.sendCommand(secret, new DoorRequestCommand(secret, ip, port, protocol, command.getBytes("UTF-8")));
+        return proxy.getDoorConnection(secret).sendCommand(new DoorRequestCommand(secret, ip, port, protocol, command.getBytes("UTF-8")));
 	}
 }

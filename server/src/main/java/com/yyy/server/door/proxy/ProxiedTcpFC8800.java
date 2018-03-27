@@ -13,10 +13,11 @@ import com.yyy.server.door.repo.Door;
 
 public class ProxiedTcpFC8800 extends AbstractFC8800 {
 	@Autowired
-	private DoorProxyFacade proxy;
+	private BioDoorProxyFacade proxy;
 	private Door door;
 	private DoorResponseCommand resp;
 	private int readPos = 0;
+    private DoorProxy doorConn;
 
 	public ProxiedTcpFC8800(Door door) {
 		super(door.getSn(), door.getPassword());
@@ -26,7 +27,7 @@ public class ProxiedTcpFC8800 extends AbstractFC8800 {
 	@Override
 	protected void connect() throws UnknownHostException, IOException {
 		try {
-			proxy.getDoorConnection(door.getSecret());
+            doorConn = proxy.getDoorConnection(door.getSecret());
 		} catch (DoorCommandException e) {
 			throw new IOException(e.getMessage(), e);
 		}
@@ -42,7 +43,7 @@ public class ProxiedTcpFC8800 extends AbstractFC8800 {
 		try {
 			resp = null;
 			readPos = 0;
-			resp = proxy.sendCommand(door.getSecret(), new DoorRequestCommand(door.getSecret(), door.getIp(),
+            resp = doorConn.sendCommand(new DoorRequestCommand(door.getSecret(), door.getIp(),
 					door.getPort(), door.getProtocol(), request));
 			if (resp instanceof ErrorResponseCommand) {
 				throw new IOException(((ErrorResponseCommand) resp).getError());

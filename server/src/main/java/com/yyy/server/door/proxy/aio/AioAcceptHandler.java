@@ -11,7 +11,7 @@ import javax.net.ssl.SSLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.yyy.server.door.proxy.DoorProxyFacade;
+import com.yyy.server.door.proxy.BioDoorProxyFacade;
 
 //这里的参数受实际调用它的函数决定。本例是服务端socket.accetp调用决定
 public class AioAcceptHandler implements CompletionHandler<AsynchronousSocketChannel, AsynchronousServerSocketChannel> {
