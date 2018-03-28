@@ -56,6 +56,16 @@ export class DoorService {
   getCardsx(domainId: number, doorId: number, pageable: Pageable): Observable<PagedResp<Card>> {
     return this.backend.listx<Card>('/domains/' + domainId + '/doors/' + doorId + '/cards', pageable);
   }
+  findCards(domainId: number, doorId: number, nameLike: string, pageable: Pageable): Observable<PagedResp<Card>> {
+    return this.backend.getx<PagedResp<Card>>('/domains/' + domainId + '/doors/' + doorId + '/cards/search', {
+      params: {
+        workerNameLike: '%' + nameLike + '%',
+        page: '' + pageable.page,
+        size: '' + pageable.size,
+        sort: pageable.sort
+      }
+    });
+  }
   getCard(domainId: number, doorId: number, cardNo: number): Observable<Card> {
     return this.backend.get<Card>('/domains/' + domainId + '/doors/' + doorId + '/cards/' + cardNo);
   }

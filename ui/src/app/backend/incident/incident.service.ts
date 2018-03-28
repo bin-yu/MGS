@@ -15,6 +15,16 @@ export class IncidentService {
   getIncidentsx(domainId: number, pageable: Pageable): Observable<PagedResp<Incident>> {
     return this.backend.listx<Incident>('/domains/' + domainId + '/incidents', pageable);
   }
+  findIncidents(domainId: number, nameLike: string, pageable: Pageable): Observable<PagedResp<Incident>> {
+    return this.backend.getx<PagedResp<Incident>>('/domains/' + domainId + '/incidents/search', {
+      params: {
+        workerNameLike: '%' + nameLike + '%',
+        page: '' + pageable.page,
+        size: '' + pageable.size,
+        sort: pageable.sort
+      }
+    });
+  }
   getIncident(domainId: number, id: Number): Observable<Incident> {
     return this.backend.get<Incident>('/domains/' + domainId + '/incidents/' + id);
   }

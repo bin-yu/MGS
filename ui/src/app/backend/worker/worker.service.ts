@@ -11,16 +11,35 @@ export class WorkerService {
 
   constructor(private backend: BackendService) { }
   getWorkersx(domainId: number, pageable: Pageable): Observable<PagedResp<Worker>> {
-    return this.backend.listx<Worker>('/domains/' + domainId + '/workers', pageable);
+    return this.backend.listx<Worker>('/domains/' + domainId + '/workers', pageable).pipe(
+      map(resp => {
+        const workers = [];
+        resp.content.forEach(p => { workers.push(Worker.clone(p)); });
+        resp.content = workers;
+        return resp;
+      })
+    );
   }
   getWorker(domainId: number, id: Number): Observable<Worker> {
-    return this.backend.get<Worker>('/domains/' + domainId + '/workers/' + id);
+    return this.backend.get<Worker>('/domains/' + domainId + '/workers/' + id).pipe(
+      map(w => Worker.clone(w))
+    );
   }
   addWorker(domainId: number, worker: Worker): Observable<Worker> {
-    return this.backend.post<Worker, Worker>('/domains/' + domainId + '/workers', worker);
+    return this.backend.post<Worker, Worker>('/domains/' + domainId + '/workers', worker).pipe(
+      map(w => Worker.clone(w))
+    );
   }
   updateWorker(domainId: number, worker: Worker): Observable<Worker> {
-    return this.backend.put<Worker>('/domains/' + domainId + '/workers/' + worker.id, worker);
+    return this.backend.put<Worker>('/domains/' + domainId + '/workers/' + worker.id, worker).pipe(
+      map(w => Worker.clone(w))
+    );
+  }
+
+  passTraining(domainId: number, worker: Worker): Observable<Worker> {
+    return this.backend.put<Worker>('/domains/' + domainId + '/workers/' + worker.id + '/passtraining', null).pipe(
+      map(w => Worker.clone(w))
+    );
   }
   deleteWorker(domainId: number, worker: Worker): Observable<void> {
     return this.backend.delete<void>('/domains/' + domainId + '/workers/' + worker.id);
@@ -33,12 +52,23 @@ export class WorkerService {
         size: '' + pageable.size,
         sort: pageable.sort
       }
-    });
+    }).pipe(
+      map(resp => {
+        const workers = [];
+        resp.content.forEach(p => { workers.push(Worker.clone(p)); });
+        resp.content = workers;
+        return resp;
+      })
+      );
   }
   findWorkers(domainId: number, nameLike: string, pageable: Pageable): Observable<Worker[]> {
     return this.findWorkersx(domainId, nameLike, pageable).pipe(
       map(
-        resp => resp.content
+        resp => {
+          const workers = [];
+          resp.content.forEach(p => { workers.push(Worker.clone(p)); });
+          return workers;
+        }
       )
     );
   }

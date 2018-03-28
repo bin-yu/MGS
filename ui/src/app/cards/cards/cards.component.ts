@@ -14,6 +14,7 @@ export class CardsComponent extends PageableComponent implements OnInit {
   doorId: number;
   cards: Card[];
   selectedCards: Set<Card>;
+  searchStr: string;
 
   constructor(private route: ActivatedRoute, private doorSrv: DoorService, private msgSrv: MessageService) {
     super();
@@ -40,12 +41,21 @@ export class CardsComponent extends PageableComponent implements OnInit {
     this.cards = [];
     this.selectedCards.clear();
     if (!isNaN(this.doorId) && !isNaN(this.domainId)) {
-      this.doorSrv.getCardsx(this.domainId, this.doorId, this.pageable).subscribe(
-        resp => {
-          this.totalItems = resp.totalElements;
-          this.cards = resp.content;
-        }
-      );
+      if (this.searchStr && this.searchStr.length > 0) {
+        this.doorSrv.findCards(this.domainId, this.doorId, this.searchStr, this.pageable).subscribe(
+          resp => {
+            this.totalItems = resp.totalElements;
+            this.cards = resp.content;
+          }
+        );
+      } else {
+        this.doorSrv.getCardsx(this.domainId, this.doorId, this.pageable).subscribe(
+          resp => {
+            this.totalItems = resp.totalElements;
+            this.cards = resp.content;
+          }
+        );
+      }
     }
   }
   handleSelectEvent(e, card: Card) {
@@ -69,5 +79,11 @@ export class CardsComponent extends PageableComponent implements OnInit {
       }
     );
   }
-
+  performSearch(event: any): void {
+    if (event.code === 'Enter') {
+      this.searchStr = event.target.value;
+      console.log('Searching cards with worker name : "' + this.searchStr + '"');
+      this.reloadItems();
+    }
+  }
 }

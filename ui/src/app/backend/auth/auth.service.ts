@@ -3,7 +3,7 @@ import { environment } from './../../../environments/environment';
 import { BackendService } from './../backend.service';
 import { UserService } from './../user/user.service';
 import { Injectable } from '@angular/core';
-import { User, Role, ROLE_USER } from '../user/user';
+import { User, Role, ROLE_USER, ROLE_ADMIN } from '../user/user';
 import { Observable } from 'rxjs/Observable';
 
 @Injectable()
@@ -34,11 +34,14 @@ export class AuthService {
   get loginUser(): User {
     return this._loginUser;
   }
-  get loginRole(): String {
+  get loginRole(): string {
     if (this.loginUser) {
       return this.loginUser.role;
     } else {
       return ROLE_USER;
     }
+  }
+  public isAdmin(): boolean {
+    return this.loginRole === ROLE_ADMIN;
   }
 }

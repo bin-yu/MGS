@@ -4,7 +4,7 @@
     <button class="btn btn-primary" type="button" (click)="performDelete()">删除</button>
   </div>
   <div class="col-sm-6 col-md-6 col-lg-6">
-      <input type="text" class="form-control" placeholder="查找...">
+      <input type="text" class="form-control" placeholder="查找姓名..." (keyup) = "performSearch($event)">
   </div>
 </div>
 <table class="table table-bordered table-hover">

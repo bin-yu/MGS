@@ -28,69 +28,78 @@ import com.yyy.server.workerIncident.repo.Incident;
 import com.yyy.server.workerIncident.repo.IncidentRepo;
 
 @RestController
-@RequestMapping({"/domains/{domainId}/workers"})
+@RequestMapping({ "/domains/{domainId}/workers" })
 public class WorkerController {
 	private Logger logger = LoggerFactory.getLogger(WorkerController.class);
-    @Autowired
-    private WorkerRepo repo;
-    @Autowired
-    private IncidentRepo incRepo;
-    @Autowired
-    private CardRepo cardRepo;
+	@Autowired
+	private WorkerRepo repo;
+	@Autowired
+	private IncidentRepo incRepo;
+	@Autowired
+	private CardRepo cardRepo;
 
-    @GetMapping
-    public Page<Worker> getWorkers(@PathVariable Long domainId,Pageable pageable) throws Exception {
-    	return repo.findByDomain(new Domain(domainId), pageable);
-    }
+	@GetMapping
+	public Page<Worker> getWorkers(@PathVariable Long domainId, Pageable pageable) throws Exception {
+		return repo.findByDomain(new Domain(domainId), pageable);
+	}
 
-    @GetMapping("/search")
-    public Page<Worker> findWorkerByNameLike(@PathVariable Long domainId,@RequestParam() String nameLike, Pageable pageable) throws Exception {
-        return repo.findByDomainAndNameLike(new Domain(domainId),nameLike, pageable);
-    }
+	@GetMapping("/search")
+	public Page<Worker> findWorkerByNameLike(@PathVariable Long domainId, @RequestParam() String nameLike,
+			Pageable pageable) throws Exception {
+		return repo.findByDomainAndNameLike(new Domain(domainId), nameLike, pageable);
+	}
 
-    @GetMapping("/{id}")
-    public Worker getWorker(@PathVariable Long domainId,@PathVariable Long id) {
-        Worker worker = repo.getByIdAndDomain(id, new Domain(domainId));
-        if(worker==null){
-        	throw new EntityNotFoundException("Worker not found for id : "+id);
-        }
+	@GetMapping("/{id}")
+	public Worker getWorker(@PathVariable Long domainId, @PathVariable Long id) {
+		Worker worker = repo.getByIdAndDomain(id, new Domain(domainId));
+		if (worker == null) {
+			throw new EntityNotFoundException("Worker not found for id : " + id);
+		}
 		return worker;
-    }
+	}
 
-    @PostMapping()
-    public Worker addWorker(@PathVariable Long domainId,@RequestBody Worker worker) {
-    	worker.setDomain(new Domain(domainId));
-        return repo.save(worker);
-    }
+	@PostMapping()
+	public Worker addWorker(@PathVariable Long domainId, @RequestBody Worker worker) {
+		worker.setDomain(new Domain(domainId));
+		return repo.save(worker);
+	}
 
-    @PutMapping("/{id}")
-    public Worker updateWorker(@PathVariable Long domainId,@PathVariable Long id, @RequestBody Worker worker) {
-        if (!id.equals(worker.getId())) {
-            throw new IllegalArgumentException("Mismatched id between path variable and request body.");
-        }
-        worker.setDomain(new Domain(domainId));
-        return repo.save(worker);
-    }
+	@PutMapping("/{id}")
+	public Worker updateWorker(@PathVariable Long domainId, @PathVariable Long id, @RequestBody Worker worker) {
+		if (!id.equals(worker.getId())) {
+			throw new IllegalArgumentException("Mismatched id between path variable and request body.");
+		}
+		worker.setDomain(new Domain(domainId));
+		return repo.save(worker);
+	}
 
-    @DeleteMapping("/{id}")
-    public void deleteWorker(@PathVariable Long domainId,@PathVariable Long id) {
-        repo.delete(getWorker(domainId, id));
-    }
+	@PutMapping("/{id}/passtraining")
+	public Worker passTraining(@PathVariable Long domainId, @PathVariable Long id) {
+		Worker worker = this.getWorker(domainId, id);
+		worker.passTraining();
+		return repo.save(worker);
+	}
 
-    @GetMapping("/{id}/incidents")
-    public List<Incident> getIncidents(@PathVariable Long domainId,@PathVariable Long id) {
-        Worker worker = this.getWorker(domainId, id);
-        return incRepo.findBySubject(worker);
-    }
+	@DeleteMapping("/{id}")
+	public void deleteWorker(@PathVariable Long domainId, @PathVariable Long id) {
+		repo.delete(getWorker(domainId, id));
+	}
 
-    @GetMapping("/{id}/cards")
-    public List<Card> getCards(@PathVariable Long domainId,@PathVariable Long id) {
-        Worker worker = this.getWorker(domainId, id);
-        return cardRepo.findByWorker(worker);
-    }
-    @RequestMapping({"/workers"})
-    @GetMapping("/blackList")
-    public List<Worker> getBlackListWorkers() throws Exception {
-        return repo.findByInBlackList(true);
-    }
+	@GetMapping("/{id}/incidents")
+	public List<Incident> getIncidents(@PathVariable Long domainId, @PathVariable Long id) {
+		Worker worker = this.getWorker(domainId, id);
+		return incRepo.findBySubject(worker);
+	}
+
+	@GetMapping("/{id}/cards")
+	public List<Card> getCards(@PathVariable Long domainId, @PathVariable Long id) {
+		Worker worker = this.getWorker(domainId, id);
+		return cardRepo.findByWorker(worker);
+	}
+
+	@RequestMapping({ "/workers" })
+	@GetMapping("/blackList")
+	public List<Worker> getBlackListWorkers() throws Exception {
+		return repo.findByInBlackList(true);
+	}
 }

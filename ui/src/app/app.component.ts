@@ -26,8 +26,8 @@ export class AppComponent implements OnInit {
   }
   ngOnInit() {
   }
-  get loginRole(): String {
-    return this.authSrv.loginRole;
+  get isAdmin(): boolean {
+    return this.authSrv.isAdmin();
   }
   toggleSideBar(): void {
     this.allIsCollapsed = !this.allIsCollapsed;

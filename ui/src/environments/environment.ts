@@ -10,6 +10,6 @@ export const environment = {
   mockUser: {
     name: 'test',
     displayName: '测试人员',
-    role: 'ADMIN'
+    role: 'USER'
   }
 };

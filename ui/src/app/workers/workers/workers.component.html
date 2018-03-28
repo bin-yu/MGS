@@ -1,8 +1,8 @@
 
 <div class="input-group ">
   <button class="btn btn-primary " type="button" routerLink="./new" >添加</button>
-  <button class="btn btn-primary " type="button" (click)="performDelete()">删除</button>
-  <button class="btn btn-primary " type="button">批量导入</button>
+  <button *ngIf="isAdmin" class="btn btn-primary " type="button" (click)="performDelete()">删除</button>
+  <button class="btn btn-primary " type="button" (click)="passTraining()">通过培训</button>
   <input type="text" class="form-control" placeholder="查找姓名..." (keyup) = "performSearch($event)">
 </div>
 <table class="table table-bordered table-hover ">
@@ -15,6 +15,7 @@
       <th scope="col">联系电话</th>
       <th scope="col">工种</th>
       <th scope="col">劳务公司</th>
+      <th scope="col">安全培训状态</th>
     </tr>
   </thead>
   <tbody>
@@ -28,6 +29,7 @@
       <td>{{worker.phoneNums}}</td>
       <td>{{worker.types}}</td>
       <td>{{worker.employer}}</td>
+      <td>{{worker.getTrainingState()}}</td>
     </tr>
   </tbody>
 </table>

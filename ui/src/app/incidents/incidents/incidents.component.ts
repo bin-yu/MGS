@@ -1,3 +1,4 @@
+import { AuthService } from './../../backend/auth/auth.service';
 import { Router } from '@angular/router';
 import { Incident, Pageable, IncidentService } from './../../backend/backend.module';
 import { Component, OnInit } from '@angular/core';
@@ -14,8 +15,13 @@ export class IncidentsComponent extends PageableComponent implements OnInit {
   domainId: number;
   incidents: Incident[];
   selectedIncidents: Set<Incident>;
-  constructor(private route: ActivatedRoute, private router: Router, private incidentSrv: IncidentService, private msgSrv: MessageService) {
+
+  searchStr: string;
+  isAdmin: boolean;
+  constructor(private route: ActivatedRoute, private router: Router,
+    private incidentSrv: IncidentService, private msgSrv: MessageService, authSrv: AuthService) {
     super();
+    this.isAdmin = authSrv.isAdmin();
     this.selectedIncidents = new Set<Incident>();
     route.params.subscribe(
       val => {
@@ -30,12 +36,21 @@ export class IncidentsComponent extends PageableComponent implements OnInit {
   ngOnInit() {
   }
   reloadItems(): void {
-    this.incidentSrv.getIncidentsx(this.domainId, this.pageable).subscribe(
-      resp => {
-        this.totalItems = resp.totalElements;
-        this.incidents = resp.content;
-      }
-    );
+    if (this.searchStr && this.searchStr.length > 0) {
+      this.incidentSrv.findIncidents(this.domainId, this.searchStr, this.pageable).subscribe(
+        resp => {
+          this.totalItems = resp.totalElements;
+          this.incidents = resp.content;
+        }
+      );
+    } else {
+      this.incidentSrv.getIncidentsx(this.domainId, this.pageable).subscribe(
+        resp => {
+          this.totalItems = resp.totalElements;
+          this.incidents = resp.content;
+        }
+      );
+    }
     this.selectedIncidents.clear();
   }
   handleSelectEvent(e, incident: Incident) {
@@ -59,6 +74,12 @@ export class IncidentsComponent extends PageableComponent implements OnInit {
       }
     );
   }
-
+  performSearch(event: any): void {
+    if (event.code === 'Enter') {
+      this.searchStr = event.target.value;
+      console.log('Searching incidents with worker name : "' + this.searchStr + '"');
+      this.reloadItems();
+    }
+  }
 
 }

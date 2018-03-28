@@ -15,7 +15,7 @@ export class UserComponent implements OnInit {
   roles = Object.entries(Role);
   constructor(private route: ActivatedRoute, private _location: Location, private userSrv: UserService, authSrv: AuthService) {
     this.user = new User();
-    if (ROLE_USER === authSrv.loginRole) {
+    if (!authSrv.isAdmin()) {
       this.roles = this.roles.filter(value => value[0] === ROLE_USER);
     }
   }

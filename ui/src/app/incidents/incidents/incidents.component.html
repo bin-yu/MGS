@@ -1,7 +1,7 @@
 <div class="input-group ">
   <button class="btn btn-primary" type="button" routerLink="./new" >添加</button>
-  <button class="btn btn-primary" type="button" (click)="performDelete()">删除</button>
-  <input type="text" class="form-control" placeholder="查找...">
+  <button *ngIf="isAdmin" class="btn btn-primary" type="button" (click)="performDelete()">删除</button>
+  <input type="text" class="form-control" placeholder="查找姓名..." (keyup) = "performSearch($event)">
 </div>
 <table class="table table-bordered table-hover">
   <thead>
