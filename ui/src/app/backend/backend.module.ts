@@ -13,7 +13,7 @@ import { AuthService } from './auth/auth.service';
 
 
 export { WorkerService } from './worker/worker.service';
-export { Worker } from './worker/worker';
+export { Worker, Sex, MALE, FEMALE } from './worker/worker';
 export { DoorService } from './door/door.service';
 export { Door } from './door/door';
 export { Card } from './door/card';

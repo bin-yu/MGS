@@ -10,6 +10,7 @@ import {
 import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import { catchError, map, tap } from 'rxjs/operators';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 
 /** Pass untouched request through to the next request handler. */
 @Injectable()
@@ -42,14 +43,9 @@ export class AuthInterceptor implements HttpInterceptor {
             if (error.status === 401) {
                 console.log('Unauthenticated! redirect to login');
                 this.document.location.href = this.document.baseURI + 'login';
-            } else if (error.status) {
-                this.msgSrv.addFail(operation + ' request failed, reason :' + (error.error) ? error.error.message : error.message);
-            }
-            if (error.message) {
-                console.log('http error:' + error.message);
             }
             // Let the app keep running by returning an empty result.
-            return of(result as T);
+            return new ErrorObservable('');
         };
     }
 }

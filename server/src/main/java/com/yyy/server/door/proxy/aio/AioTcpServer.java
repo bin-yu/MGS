@@ -89,9 +89,15 @@ public class AioTcpServer {
     }
     public void stop(){
     	try {
-			asyncChannelGroup.shutdownNow();
+    		try {
+				ssc.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			asyncChannelGroup.shutdown();
 	    	asyncChannelGroup.awaitTermination(5, TimeUnit.SECONDS);
-		} catch (IOException | InterruptedException e) {
+		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

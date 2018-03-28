@@ -28,6 +28,9 @@ public class WorkerImporter implements TableImporter {
 
     static Map<String, ColType> colTypes = new HashMap<String, ColType>();
     static {
+    	colTypes.put("DOMAIN_ID", ColType.INTEGER);
+    	colTypes.put("SEX", ColType.INTEGER);
+        colTypes.put("HOME_ADDR", ColType.STRING);
         colTypes.put("ID_NO", ColType.STRING);
         colTypes.put("ID_TYPE", ColType.STRING);
         colTypes.put("NAME", ColType.STRING);

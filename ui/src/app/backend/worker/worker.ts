@@ -9,6 +9,8 @@ export class Worker {
   inBlackList: boolean;
   trainingState: string;
   score: number;
+  sex = MALE;
+  homeAddr: string;
   incidentCnts: Map<String, number>;
   static create(id: number, name: string): Worker {
     const w = new Worker;
@@ -40,7 +42,20 @@ export class Worker {
         return this.trainingState;
     }
   }
+  public getSexStr(): string {
+    if (!this.sex) {
+      return '未知';
+    } else {
+      return Sex[this.sex];
+    }
+  }
 }
 export const NOT_TRAINED = 'NOT_TRAINED';
 export const TRAINED = 'TRAINED';
 export const RETRAINED = 'RETRAINED';
+export const MALE = 'MALE';
+export const FEMALE = 'FEMALE';
+export enum Sex {
+  MALE = '男',
+  FEMALE = '女'
+}

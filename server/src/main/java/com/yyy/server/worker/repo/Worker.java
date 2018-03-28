@@ -31,7 +31,9 @@ public class Worker implements Serializable {
 	private static final int INITIAL_SCORE = 100;
 
 	private static final long serialVersionUID = -8743126316266346607L;
-
+	static enum Sex {
+		MALE,FEMALE
+	}
 	static enum TrainingState {
 		NOT_TRAINED, TRAINED, RETRAINED
 	}
@@ -42,21 +44,28 @@ public class Worker implements Serializable {
 
 	@Column(nullable = false)
 	private String name;
-
-	@Column(nullable = false)
+	
+	@Column(nullable = false, columnDefinition = "INTEGER DEFAULT 0")
+	private Sex sex;
+	
+	@Column(nullable = false, unique = true)
 	private String idNo;
 
 	@Column(nullable = true)
 	private String idType;
 
 	@Column(nullable = true)
-	private String types;
+	private String types;//工种
 
 	@Column(nullable = true)
 	private String[] phoneNums;
 
 	@Column(nullable = true)
 	private String employer;
+	
+	@Column(nullable = true)
+	private String homeAddr;
+	
 	@Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
 	private Boolean inBlackList = false;
 	@Column(nullable = false, columnDefinition = "INTEGER DEFAULT 0")
@@ -175,6 +184,22 @@ public class Worker implements Serializable {
 	@JsonIgnore
 	public void setScore(int score) {
 		this.score = score;
+	}
+
+	public Sex getSex() {
+		return sex;
+	}
+
+	public void setSex(Sex sex) {
+		this.sex = sex;
+	}
+
+	public String getHomeAddr() {
+		return homeAddr;
+	}
+
+	public void setHomeAddr(String homeAddr) {
+		this.homeAddr = homeAddr;
 	}
 
 	@JsonGetter

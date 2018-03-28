@@ -13,6 +13,7 @@
       <th scope="col">员工编号</th>
       <th scope="col">证件号码</th>
       <th scope="col">联系电话</th>
+      <th scope="col">性别</th>
       <th scope="col">工种</th>
       <th scope="col">劳务公司</th>
       <th scope="col">安全培训状态</th>
@@ -27,6 +28,7 @@
       <td>{{worker.id}}</td>
       <td>{{worker.idNo}}</td>
       <td>{{worker.phoneNums}}</td>
+      <td>{{worker.getSexStr()}}</td>
       <td>{{worker.types}}</td>
       <td>{{worker.employer}}</td>
       <td>{{worker.getTrainingState()}}</td>

@@ -8,6 +8,14 @@
     </div>
   </div>
   <div class="form-group row">
+    <label for="sex" class="col-lg-2 col-form-label">性别</label>
+    <div class="col-lg-10">
+      <select class="form-control" id="sex" name="sex" [(ngModel)]="worker.sex">
+        <option *ngFor="let sex of sexes" value='{{sex[0]}}'>{{sex[1]}}</option>
+        </select>
+    </div>
+  </div>
+  <div class="form-group row">
     <label for="idNo" class="col-lg-2 col-form-label">证件号码</label>
     <div class="col-lg-10">
       <input type="text" class="form-control" id="idNo" name="idNo" placeholder="输入身份证号" [(ngModel)]="worker.idNo">
@@ -29,6 +37,12 @@
     <label for="employer" class="col-lg-2 col-form-label">劳务公司</label>
     <div class="col-lg-10">
       <input type="text" class="form-control" id="employer" name="employer" placeholder="输入劳务公司" [(ngModel)]="worker.employer">
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="addr" class="col-lg-2 col-form-label">家庭住址</label>
+    <div class="col-lg-10">
+      <input type="text" class="form-control" id="addr" name="addr" placeholder="输入住址" [(ngModel)]="worker.homeAddr">
     </div>
   </div>
   <div class="container-fluid">
