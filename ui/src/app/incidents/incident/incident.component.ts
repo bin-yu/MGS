@@ -1,4 +1,5 @@
-import { Injectable, Component, OnInit } from '@angular/core';
+import { DialogComponent } from './../../share/dialog/dialog.component';
+import { Injectable, Component, OnInit, ViewChild } from '@angular/core';
 import { Incident, IncidentService } from '../../backend/backend.module';
 import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
@@ -58,6 +59,7 @@ export class NgbDateNativeAdapter extends NgbDateAdapter<Date> {
   { provide: NgbDatepickerI18n, useClass: CustomDatepickerI18n }]
 })
 export class IncidentComponent implements OnInit {
+  @ViewChild('dialog') dialog: DialogComponent;
   cats = [
     {
       value: 'BLACK',
@@ -103,18 +105,12 @@ export class IncidentComponent implements OnInit {
 
   onSubmit(): void {
     if (this.isAdd) {
-      this.incidentSrv.addIncident(this.domainId, this.incident).subscribe(
-        incident => {
-          this._location.back();
-        }
-      );
+      this.dialog.doWork('添加事件',
+        this.incidentSrv.addIncident(this.domainId, this.incident));
     } else {
       // update incident
-      this.incidentSrv.updateIncident(this.domainId, this.incident).subscribe(
-        incident => {
-          this._location.back();
-        }
-      );
+      this.dialog.doWork('修改事件',
+        this.incidentSrv.updateIncident(this.domainId, this.incident));
     }
   }
 

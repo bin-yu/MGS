@@ -1,4 +1,5 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { DialogComponent } from './../../share/dialog/dialog.component';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { Card, Door, DoorService } from '../../backend/backend.module';
 import { MessageService } from '../../messages/message.service';
 import { ActivatedRoute } from '@angular/router';
@@ -10,6 +11,7 @@ import { PageableComponent } from '../../share/share.module';
   styleUrls: ['./cards.component.scss']
 })
 export class CardsComponent extends PageableComponent implements OnInit {
+  @ViewChild('dialog') dialog: DialogComponent;
   domainId: number;
   doorId: number;
   cards: Card[];
@@ -67,15 +69,19 @@ export class CardsComponent extends PageableComponent implements OnInit {
   }
 
   performDelete(): void {
+    const obs = [];
     this.selectedCards.forEach(
       (value: Card, value2: Card, set: Set<Card>) => {
-        this.doorSrv.delCard(this.domainId, this.doorId, value.cardNo).subscribe(
+        obs.push(this.doorSrv.delCard(this.domainId, this.doorId, value.cardNo).map(
           _ => {
             console.log('card deleted: ' + value.cardNo);
-            this.msgSrv.addSuccess('卡片删除成功：' + value.cardNo);
-            this.reloadItems();
           }
-        );
+        ));
+      }
+    );
+    this.dialog.startWorks('删除门禁卡', obs).subscribe(
+      _ => {
+        this.reloadItems();
       }
     );
   }

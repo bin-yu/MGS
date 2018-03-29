@@ -1,5 +1,6 @@
+import { DialogComponent } from './../../share/dialog/dialog.component';
 import { Location } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';
 import { DoorService, Door } from './../../backend/backend.module';
@@ -10,6 +11,7 @@ import { DoorService, Door } from './../../backend/backend.module';
   styleUrls: ['./door.component.scss']
 })
 export class DoorComponent implements OnInit {
+  @ViewChild('dialog') dialog: DialogComponent;
   domainId: number;
   isAdd: boolean;
   door: Door;
@@ -37,18 +39,12 @@ export class DoorComponent implements OnInit {
 
   onSubmit(): void {
     if (this.isAdd) {
-      this.doorSrv.addDoor(this.domainId, this.door).subscribe(
-        door => {
-          this._location.back();
-        }
-      );
+      this.dialog.doWork('添加门禁',
+        this.doorSrv.addDoor(this.domainId, this.door));
     } else {
       // update door
-      this.doorSrv.updateDoor(this.domainId, this.door).subscribe(
-        door => {
-          this._location.back();
-        }
-      );
+      this.dialog.doWork('修改门禁',
+        this.doorSrv.updateDoor(this.domainId, this.door));
     }
   }
 

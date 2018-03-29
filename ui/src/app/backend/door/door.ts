@@ -6,4 +6,5 @@ export class Door {
     ip: string;
     port: number;
     label: string;
+    secret: string;
 }

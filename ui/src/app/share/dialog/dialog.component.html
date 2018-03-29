@@ -1,0 +1,20 @@
+<div id="myModal" class="modal fade" role="dialog">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h6 class="modal-title">{{title}}</h6>
+        <button *ngIf="isComplete()" type="button" class="close" data-dismiss="modal">&times;</button>
+
+      </div>
+      <div class="modal-body">
+        <div *ngIf="!isComplete()">
+          <jqxProgressBar #horizontal [template]="'success'" [showText]="true" [animationDuration]="0" [height]="48" [value]="progress"></jqxProgressBar>
+        </div>
+        <div *ngIf="isComplete()" class="msgPane alert alert-{{failed?'danger':'success'}}">{{completeMsg}}</div>
+      </div>
+      <div class="modal-footer">
+        <button [disabled]="isComplete()?'':'disabled'" type="button" class="btn btn-primary btn-default" data-dismiss="modal">关闭</button>
+      </div>
+    </div>
+  </div>
+</div>

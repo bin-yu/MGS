@@ -74,3 +74,4 @@
       <button type="button" class=" btn btn-primary btn-lg submit-btn" routerLink="../">取消</button>
   </div>
 </form>
+<app-dialog #dialog [title]="isAdd?'添加事件':'修改事件'" [goBackOnSuccess]="true"></app-dialog>

@@ -1,3 +1,8 @@
+// remove padding-right added by modal dialog
+body {
+  padding-right:0!important;
+}
+
 .btn {
   cursor:pointer;
 }

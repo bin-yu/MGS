@@ -1,6 +1,7 @@
+import { DialogComponent } from './../../share/dialog/dialog.component';
 import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { PolicyService } from '../../backend/policy/policy.service';
 import { Policy, Condition, Action, PropertyName, Comparator } from '../../backend/backend.module';
 
@@ -11,6 +12,7 @@ import { Policy, Condition, Action, PropertyName, Comparator } from '../../backe
 })
 export class PolicyComponent implements OnInit {
 
+  @ViewChild('dialog') dialog: DialogComponent;
   policy: Policy;
   isAdd: boolean;
   actions = Object.entries(Action);
@@ -35,17 +37,11 @@ export class PolicyComponent implements OnInit {
   }
   onSubmit(): void {
     if (this.isAdd) {
-      this.srv.addPolicy(this.policy).subscribe(
-        policy => {
-          this._location.back();
-        }
-      );
+      this.dialog.doWork('添加策略',
+        this.srv.addPolicy(this.policy));
     } else {
-      this.srv.updatePolicy(this.policy).subscribe(
-        policy => {
-          this._location.back();
-        }
-      );
+      this.dialog.doWork('修改策略',
+        this.srv.updatePolicy(this.policy));
     }
   }
 

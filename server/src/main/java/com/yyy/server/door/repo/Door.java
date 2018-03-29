@@ -14,6 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.yyy.server.card.repo.Card;
@@ -103,11 +104,11 @@ public class Door implements Serializable {
     public void setLabel(String label) {
         this.label = label;
     }
-
+    @JsonGetter
 	public String getSecret() {
 		return secret;
 	}
-
+	@JsonIgnore
 	public void setSecret(String secret) {
 		this.secret = secret;
 	}

@@ -1,5 +1,6 @@
+import { DialogComponent } from './../../share/dialog/dialog.component';
 import { Router } from '@angular/router';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { PageableComponent } from '../../share/pageable-component';
 import { Policy, PolicyService, Action, Condition, PropertyName, Comparator } from '../../backend/backend.module';
 import { MessageService } from '../../messages/message.service';
@@ -10,7 +11,7 @@ import { MessageService } from '../../messages/message.service';
   styleUrls: ['./policies.component.scss']
 })
 export class PoliciesComponent extends PageableComponent implements OnInit {
-
+  @ViewChild('dialog') dialog: DialogComponent;
   policies: Policy[];
   selectedPolicys: Set<Policy>;
   constructor(private router: Router, private policySrv: PolicyService, private msgSrv: MessageService) {
@@ -38,25 +39,26 @@ export class PoliciesComponent extends PageableComponent implements OnInit {
     }
   }
   performDelete(): void {
+    const obs = [];
     this.selectedPolicys.forEach(
       (value: Policy, value2: Policy, set: Set<Policy>) => {
-        this.policySrv.deletePolicy(value).subscribe(
+        obs.push(this.policySrv.deletePolicy(value).map(
           _ => {
             console.log('policy deleted: ' + value.id);
-            this.msgSrv.addSuccess('策略删除成功：' + value.id);
-            this.reloadItems();
           }
-        );
+        ));
+      }
+    );
+    this.dialog.title = '删除策略';
+    this.dialog.startWorks('删除策略', obs).subscribe(
+      _ => {
+        this.reloadItems();
       }
     );
   }
   runAll(): void {
-    this.policySrv.runAll().subscribe(
-      _ => {
-        console.log('Run all policies now !!!');
-        this.msgSrv.addSuccess('策略成功开始运行');
-      }
-    );
+    this.dialog.doWork('运行所有策略',
+      this.policySrv.runAll());
   }
 
 }

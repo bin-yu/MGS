@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { DialogComponent } from './../../share/dialog/dialog.component';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { WorkerService } from '../../backend/backend.module';
@@ -10,6 +11,7 @@ import { Location } from '@angular/common';
   styleUrls: ['./worker.component.scss']
 })
 export class WorkerComponent implements OnInit {
+  @ViewChild('dialog') dialog: DialogComponent;
   domainId: number;
   isAdd: boolean;
   worker: Worker;
@@ -37,21 +39,10 @@ export class WorkerComponent implements OnInit {
 
   onSubmit(): void {
     if (this.isAdd) {
-      this.workerSrv.addWorker(this.domainId, this.worker).subscribe(
-        worker => {
-          this._location.back();
-        }
-      );
+      this.dialog.doWork('添加新劳工', this.workerSrv.addWorker(this.domainId, this.worker));
     } else {
       // update worker
-      this.workerSrv.updateWorker(this.domainId, this.worker).subscribe(
-        worker => {
-          this._location.back();
-        }
-      );
+      this.dialog.doWork('修改劳工', this.workerSrv.updateWorker(this.domainId, this.worker));
     }
-  }
-  onCancel(): void {
-    this._location.back();
   }
 }

@@ -1,6 +1,7 @@
+import { DialogComponent } from './../../share/dialog/dialog.component';
 import { MessageService } from './../../messages/messages.module';
 import { DoorService, Door } from './../../backend/backend.module';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { forEach } from '@angular/router/src/utils/collection';
 import { PageableComponent } from '../../share/share.module';
@@ -11,6 +12,7 @@ import { PageableComponent } from '../../share/share.module';
   styleUrls: ['./doors.component.scss']
 })
 export class DoorsComponent extends PageableComponent implements OnInit {
+  @ViewChild('dialog') dialog: DialogComponent;
   domainId: number;
   doors: Door[];
   selectedDoors: Set<Door>;
@@ -49,31 +51,38 @@ export class DoorsComponent extends PageableComponent implements OnInit {
   }
 
   performDelete(): void {
+    const obs = [];
     this.selectedDoors.forEach(
       (value: Door, value2: Door, set: Set<Door>) => {
-        this.doorSrv.deleteDoor(this.domainId, value).subscribe(
+        obs.push(this.doorSrv.deleteDoor(this.domainId, value).map(
           _ => {
             console.log('door deleted: ' + value.sn);
-            this.msgSrv.addSuccess('门禁删除成功：' + value.sn);
-            this.reloadItems();
           }
-        );
+        ));
+      }
+    );
+
+    this.dialog.title = '删除门禁';
+    this.dialog.startWorks('删除门禁', obs).subscribe(
+      _ => {
+        this.reloadItems();
       }
     );
   }
 
   performTest(): void {
-    this.msg = '';
+    const obs = [];
     this.selectedDoors.forEach(
       (value: Door, value2: Door, set: Set<Door>) => {
-        this.doorSrv.getVersion(this.domainId, value).subscribe(
+        obs.push(this.doorSrv.getVersion(this.domainId, value).map(
           version => {
             console.log('door ' + value.sn + ', version is ' + version);
-            this.msg += '门禁 ' + value.sn + ' 版本 ：' + version + '</p>';
           }
-        );
+        ));
       }
     );
+    this.dialog.title = '门禁连接测试';
+    this.dialog.startWorks('门禁连接测试', obs).subscribe();
   }
 
   checkCardAreaStatus(): void {

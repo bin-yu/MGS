@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { DialogComponent } from './../../share/dialog/dialog.component';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService, UserService, User, Role, ROLE_ADMIN, ROLE_USER } from './../../backend/backend.module';
@@ -9,6 +10,7 @@ import { AuthService, UserService, User, Role, ROLE_ADMIN, ROLE_USER } from './.
   styleUrls: ['./user.component.scss']
 })
 export class UserComponent implements OnInit {
+  @ViewChild('dialog') dialog: DialogComponent;
   domainId: number;
   isAdd: boolean;
   user: User;
@@ -37,18 +39,12 @@ export class UserComponent implements OnInit {
 
   onSubmit(): void {
     if (this.isAdd) {
-      this.userSrv.addUser(this.domainId, this.user).subscribe(
-        user => {
-          this._location.back();
-        }
-      );
+      this.dialog.doWork('添加用户',
+        this.userSrv.addUser(this.domainId, this.user));
     } else {
       // update user
-      this.userSrv.updateUser(this.domainId, this.user).subscribe(
-        user => {
-          this._location.back();
-        }
-      );
+      this.dialog.doWork('修改用户',
+        this.userSrv.updateUser(this.domainId, this.user));
     }
   }
 

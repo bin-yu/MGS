@@ -1,6 +1,7 @@
+import { DialogComponent } from './../../share/dialog/dialog.component';
 import { MessageService } from './../../messages/message.service';
 import { UserService, User } from './../../backend/backend.module';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { PageableComponent } from '../../share/share.module';
 @Component({
@@ -9,6 +10,7 @@ import { PageableComponent } from '../../share/share.module';
   styleUrls: ['./users.component.scss']
 })
 export class UsersComponent extends PageableComponent implements OnInit {
+  @ViewChild('dialog') dialog: DialogComponent;
   domainId: number;
   users: User[];
   selectedUsers: Set<User>;
@@ -57,15 +59,19 @@ export class UsersComponent extends PageableComponent implements OnInit {
     }
   }
   performDelete(): void {
+    const obs = [];
     this.selectedUsers.forEach(
       (value: User, value2: User, set: Set<User>) => {
-        this.userSrv.deleteUser(this.domainId, value).subscribe(
+        obs.push(this.userSrv.deleteUser(this.domainId, value).map(
           _ => {
             console.log('user deleted: ' + value.id);
-            this.msgSrv.addSuccess('用户删除成功：' + value.id);
-            this.reloadItems();
           }
-        );
+        ));
+      }
+    );
+    this.dialog.startWorks('删除用户', obs).subscribe(
+      _ => {
+        this.reloadItems();
       }
     );
   }

@@ -54,7 +54,7 @@ public class IncidentController {
     }
 
     @PostMapping()
-    @Transactional
+    @Transactional(rollbackFor = Throwable.class)
     public Incident addIncident(@PathVariable Long domainId, @RequestBody Incident incident) {
         incident.setRecordTime(new Date());
         incident.setDomain(new Domain(domainId));
@@ -62,7 +62,7 @@ public class IncidentController {
     }
 
     @PutMapping("/{id}")
-    @Transactional
+    @Transactional(rollbackFor = Throwable.class)
     public Incident updateIncident(@PathVariable Long domainId, @PathVariable Long id, @RequestBody Incident incident) {
         if (!id.equals(incident.getId())) {
             throw new IllegalArgumentException("Mismatched id between path variable and request body.");
@@ -73,7 +73,7 @@ public class IncidentController {
     }
 
     @DeleteMapping("/{id}")
-    @Transactional
+    @Transactional(rollbackFor = Throwable.class)
     public void deleteIncident(@PathVariable Long domainId, @PathVariable Long id) throws Exception {
         Incident incident = getIncident(domainId, id);
         adjustScoreFor(incident, false);

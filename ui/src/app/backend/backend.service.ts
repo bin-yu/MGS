@@ -43,28 +43,16 @@ export class BackendService {
     );
   }
   post<T, R>(url: string, body: T): Observable<R> {
-    return this.http.post<R>(environment.apibaseurl + url, body).pipe(
-      tap(_ => { this.logSucceed('添加'); }),
-      catchError(this.handleError<R>('添加', null))
-    );
+    return this.http.post<R>(environment.apibaseurl + url, body);
   }
   postx<T>(url: string, body: T, options: any): Observable<any> {
-    return this.http.post<any>(environment.apibaseurl + url, body, options).pipe(
-      tap(_ => { this.logSucceed('添加'); }),
-      catchError(this.handleError<any>('添加', null))
-    );
+    return this.http.post<any>(environment.apibaseurl + url, body, options);
   }
   put<T>(url: string, body: T): Observable<T> {
-    return this.http.put<T>(environment.apibaseurl + url, body).pipe(
-      tap(_ => { this.logSucceed('修改'); }),
-      catchError(this.handleError<T>('修改', null))
-    );
+    return this.http.put<T>(environment.apibaseurl + url, body);
   }
   delete<T>(url: string): Observable<void> {
-    return this.http.delete<void>(environment.apibaseurl + url).pipe(
-      tap(_ => { this.logSucceed('删除'); }),
-      catchError(this.handleError<void>('删除', null))
-    );
+    return this.http.delete<void>(environment.apibaseurl + url);
   }
   /**
      * Handle Http operation that failed.
@@ -72,14 +60,11 @@ export class BackendService {
      * @param operation - name of the operation that failed
      * @param result - optional value to return as the observable result
      */
-  protected /*  */handleError<T>(operation = 'operation', result?: T) {
+  protected /*  */handleError<T>(operation: string, result?: T) {
     return (error: any): Observable<T> => {
       this.msgSrv.addFail(operation + '失败');
       // Let the app keep running by returning an empty result.
       return of(result as T);
     };
-  }
-  private logSucceed(operation: string) {
-    this.msgSrv.addSuccess(operation + '成功');
   }
 }

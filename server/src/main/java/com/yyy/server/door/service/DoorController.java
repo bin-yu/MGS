@@ -101,11 +101,12 @@ public class DoorController {
 		return cardRepo.findByDoorId(door.getId(), pageable);
 	}
 
-    @GetMapping("/{did}/cards/search")
-    public Page<Card> findCardsByWorkerNameLike(@PathVariable Long domainId, @PathVariable Long did, @RequestParam() String workerNameLike, Pageable pageable) throws Exception {
-        Door door = this.getDoor(domainId, did);
-        return cardRepo.findByDoorIdAndWorker_NameLike(door.getId(), workerNameLike, pageable);
-    }
+	@GetMapping("/{did}/cards/search")
+	public Page<Card> findCardsByWorkerNameLike(@PathVariable Long domainId, @PathVariable Long did,
+			@RequestParam() String workerNameLike, Pageable pageable) throws Exception {
+		Door door = this.getDoor(domainId, did);
+		return cardRepo.findByDoorIdAndWorker_NameLike(door.getId(), workerNameLike, pageable);
+	}
 
 	@GetMapping("/{did}/cards/{cid}/cardData")
 	public CardData readCard(@PathVariable Long domainId, @PathVariable Long did, @PathVariable Long cid)
@@ -126,7 +127,7 @@ public class DoorController {
 	}
 
 	@PostMapping("/{did}/cards")
-	@Transactional
+	@Transactional(rollbackFor = Throwable.class)
 	public Card addCard(@PathVariable Long domainId, @PathVariable Long did, @RequestParam Long cid,
 			@RequestParam Long workerId, @RequestParam(required = false, defaultValue = "false") boolean upload)
 			throws IOException {
@@ -152,7 +153,7 @@ public class DoorController {
 	}
 
 	@DeleteMapping("/{did}/cards/{cid}")
-	@Transactional
+	@Transactional(rollbackFor = Throwable.class)
 	public void delCard(@PathVariable Long domainId, @PathVariable Long did, @PathVariable Long cid,
 			@RequestParam(required = false, defaultValue = "true") boolean upload) throws IOException {
 		Card card = this.getCard(domainId, did, cid);

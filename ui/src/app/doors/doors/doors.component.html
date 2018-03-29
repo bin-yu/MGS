@@ -1,11 +1,11 @@
 <div class="input-group ">
   <button class="btn btn-primary" type="button" routerLink="./new">添加</button>
   <button class="btn btn-primary" type="button" (click)="performDelete()">删除</button>
-  <button class="btn btn-primary" type="button" (click)="performTest()">测试连接</button>
-  <button class="btn btn-primary" type="button" (click)="checkCardAreaStatus()">查看卡区域状态</button>
+  <!--<button class="btn btn-primary" type="button" (click)="performTest()">测试连接</button>
+   <button class="btn btn-primary" type="button" (click)="checkCardAreaStatus()">查看卡区域状态</button>
   <button class="btn btn-primary" type="button" (click)="readCardData()">查看卡</button>
   <button class="btn btn-primary" type="button" (click)="deleteCard()">删除卡</button>
-  <button class="btn btn-primary" type="button" (click)="addCardToBlacklist()">添加黑名单</button>
+  <button class="btn btn-primary" type="button" (click)="addCardToBlacklist()">添加黑名单</button> -->
 </div>
 <table class="table table-bordered table-hover">
   <thead>
@@ -35,6 +35,5 @@
 </table>
 <app-pagination [totalItems]="totalItems" [pageSize]="pageable.size" (onPageLoad)="loadPage($event)"></app-pagination>
 
-<div class="alert alert-success msg-pane" *ngIf="msg">
-  {{msg}}
-</div>
+
+<app-dialog #dialog [title]="'删除门禁'"></app-dialog>

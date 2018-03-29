@@ -40,9 +40,15 @@
         <input type="text" class="form-control" id="port" name="port" placeholder="输入端口号" [(ngModel)]="door.port">
       </div>
     </div>
+    <div *ngIf="!isAdd" class="form-group row">
+      <label for="secret" class="col-lg-2 col-form-label">密钥</label>
+      <div class="col-lg-10">
+        <input type="text" class="form-control" id="secret" name="secret" [ngModel]="door.secret" disabled>
+      </div>
+    </div>
     <div class="container-fluid">
         <button type="button" class=" btn btn-primary btn-lg submit-btn" (click)="onSubmit()">提交</button>
         <button type="button" class=" btn btn-primary btn-lg submit-btn" routerLink="../">取消</button>
     </div>
   </form>
-
+  <app-dialog #dialog [title]="isAdd?'添加门禁':'修改门禁'" [goBackOnSuccess]="true"></app-dialog>

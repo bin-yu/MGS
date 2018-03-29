@@ -1,7 +1,8 @@
+import { DialogComponent } from './../../share/dialog/dialog.component';
 import { AuthService } from './../../backend/auth/auth.service';
 import { Router } from '@angular/router';
 import { Incident, Pageable, IncidentService } from './../../backend/backend.module';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MessageService } from '../../messages/messages.module';
 import { PageableComponent } from '../../share/share.module';
 import { ActivatedRoute } from '@angular/router';
@@ -12,6 +13,7 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./incidents.component.scss']
 })
 export class IncidentsComponent extends PageableComponent implements OnInit {
+  @ViewChild('dialog') dialog: DialogComponent;
   domainId: number;
   incidents: Incident[];
   selectedIncidents: Set<Incident>;
@@ -62,15 +64,19 @@ export class IncidentsComponent extends PageableComponent implements OnInit {
   }
 
   performDelete(): void {
+    const obs = [];
     this.selectedIncidents.forEach(
       (value: Incident, value2: Incident, set: Set<Incident>) => {
-        this.incidentSrv.deleteIncident(this.domainId, value).subscribe(
+        obs.push(this.incidentSrv.deleteIncident(this.domainId, value).map(
           _ => {
             console.log('incident deleted: ' + value.id);
-            this.msgSrv.addSuccess('事件删除成功：' + value.id);
-            this.reloadItems();
           }
-        );
+        ));
+      }
+    );
+    this.dialog.startWorks('删除事件', obs).subscribe(
+      results => {
+        this.reloadItems();
       }
     );
   }

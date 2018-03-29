@@ -22,6 +22,7 @@
   "files": [
     "node_modules/jqwidgets-scripts/jqwidgets-ts/angular_jqxtree.ts",
     "node_modules/jqwidgets-scripts/jqwidgets-ts/angular_jqxtreegrid.ts",
-    "node_modules/jqwidgets-scripts/jqwidgets-ts/angular_jqxmenu.ts"
-  ]
+    "node_modules/jqwidgets-scripts/jqwidgets-ts/angular_jqxmenu.ts",
+    "node_modules/jqwidgets-scripts/jqwidgets-ts/angular_jqxprogressbar.ts"
+      ]
 }

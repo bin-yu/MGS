@@ -30,3 +30,5 @@
   </tbody>
 </table>
 <app-pagination [totalItems] = "totalItems" [pageSize]="pageable.size" (onPageLoad)="loadPage($event)"></app-pagination>
+
+<app-dialog #dialog [title]="'删除门禁卡'"></app-dialog>

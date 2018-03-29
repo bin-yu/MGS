@@ -1,3 +1,4 @@
+import { DialogComponent } from './../../share/dialog/dialog.component';
 import { Observable } from 'rxjs/Observable';
 
 import { of } from 'rxjs/observable/of';
@@ -8,7 +9,7 @@ import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/operator/merge';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Worker, Card, DoorService, WorkerService } from '../../backend/backend.module';
 import { Location } from '@angular/common';
@@ -22,6 +23,7 @@ import { Location } from '@angular/common';
   styleUrls: ['./card.component.scss']
 })
 export class CardComponent implements OnInit {
+  @ViewChild('dialog') dialog: DialogComponent;
   domainId: number;
   card: Card;
   isAdd: boolean;
@@ -48,11 +50,8 @@ export class CardComponent implements OnInit {
 
   onSubmit(): void {
     if (this.isAdd) {
-      this.doorSrv.addCard(this.domainId, this.card.doorId, this.card, this.isUpload).subscribe(
-        card => {
-          this._location.back();
-        }
-      );
+      this.dialog.doWork('添加门禁卡',
+        this.doorSrv.addCard(this.domainId, this.card.doorId, this.card, this.isUpload));
     }
   }
 

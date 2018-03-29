@@ -4,3 +4,6 @@
 footer.sticky-footer {
     position: fixed;
 }
+.navbar {
+    padding-right:0!important;
+}

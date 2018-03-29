@@ -1,6 +1,7 @@
+import { DialogComponent } from './../../share/dialog/dialog.component';
 import { AuthService } from './../../backend/auth/auth.service';
 import { Observable } from 'rxjs/Observable';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { WorkerService, Worker, Pageable } from '../../backend/backend.module';
 import { Router, ActivatedRoute } from '@angular/router';
 import { forEach } from '@angular/router/src/utils/collection';
@@ -13,6 +14,7 @@ import 'rxjs/add/observable/forkJoin';
   styleUrls: ['./workers.component.scss']
 })
 export class WorkersComponent extends PageableComponent implements OnInit {
+  @ViewChild('dialog') dialog: DialogComponent;
   domainId: number;
   workers: Worker[];
   selectedWorkers: Set<Worker>;
@@ -70,14 +72,15 @@ export class WorkersComponent extends PageableComponent implements OnInit {
     this.selectedWorkers.forEach(
       (value: Worker, value2: Worker, set: Set<Worker>) => {
         obs.push(this.workerSrv.deleteWorker(this.domainId, value).map(
-          _ => {
-            console.log('worker deleted: ' + value.name);
-            this.msgSrv.addSuccess('劳工删除成功：' + value.name);
+          w => {
+            console.log('Worker deleted:' + value.name);
           }
         ));
       }
     );
-    Observable.forkJoin(obs).subscribe(
+
+    this.dialog.title = '删除劳工';
+    this.dialog.startWorks('删除劳工', obs).subscribe(
       results => {
         this.reloadItems();
       }
@@ -91,16 +94,18 @@ export class WorkersComponent extends PageableComponent implements OnInit {
     }
   }
   passTraining(): void {
+    const obs = [];
     this.selectedWorkers.forEach(
       (value: Worker, value2: Worker, set: Set<Worker>) => {
-        this.workerSrv.passTraining(this.domainId, value).subscribe(
+        obs.push(this.workerSrv.passTraining(this.domainId, value).map(
           updatedWorker => {
             console.log('worker passed training: ' + value.name);
-            this.msgSrv.addSuccess('劳工通过培训：' + value.name);
             value.copy(updatedWorker);
           }
-        );
+        ));
       }
     );
+    this.dialog.title = '劳工通过培训';
+    this.dialog.startWorks('劳工通过培训', obs).subscribe();
   }
 }

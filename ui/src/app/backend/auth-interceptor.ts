@@ -1,6 +1,5 @@
 
 import { Injectable, Inject } from '@angular/core';
-import { MessageService } from '../messages/messages.module';
 import { DOCUMENT } from '@angular/platform-browser';
 
 import {
@@ -15,7 +14,7 @@ import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 /** Pass untouched request through to the next request handler. */
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-    constructor(protected msgSrv: MessageService, @Inject(DOCUMENT) private document: any) {
+    constructor( @Inject(DOCUMENT) private document: any) {
 
     }
     intercept(req: HttpRequest<any>, next: HttpHandler):

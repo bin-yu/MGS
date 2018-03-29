@@ -1,0 +1,27 @@
+#myModal{
+    padding-right: 0;
+}
+.modal.show .modal-dialog,.modal-dialog {
+    top:50%;
+    transform: translate(0,-50%);
+}
+.modal-header {
+    border:none;
+}
+.modal-footer {
+    border:none;
+    margin:auto;
+}
+.msgPane{
+    text-align: center;
+}
+.msgPane.alert {
+    margin-bottom: 0;
+}
+/* 
+.modal-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+} */
