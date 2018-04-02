@@ -72,4 +72,21 @@ export class WorkerService {
       )
     );
   }
+
+  findWorkersFromAncestorDomains(domainId: number, nameLike: string, pageable: Pageable): Observable<Worker[]> {
+    return this.backend.getx<PagedResp<Worker>>('/domains/' + domainId + '/workers/searchRecursive', {
+      params: {
+        nameLike: '%' + nameLike + '%',
+        page: '' + pageable.page,
+        size: '' + pageable.size,
+        sort: pageable.sort
+      }
+    }).pipe(
+      map(resp => {
+        const workers = [];
+        resp.content.forEach(p => { workers.push(Worker.clone(p)); });
+        return workers;
+      })
+      );
+  }
 }

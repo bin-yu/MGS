@@ -12,8 +12,8 @@
     <tr>
       <th scope="col"></th>
       <th scope="col">卡号</th>
-      <th scope="col">员工编号</th>
       <th scope="col">员工姓名</th>
+      <th scope="col">证件号码</th>
       <th scope="col">是否在黑名单</th>
     </tr>
   </thead>
@@ -23,8 +23,8 @@
         <input type="checkbox" (change)="handleSelectEvent($event,card)" />
       </th>
       <td>{{card.cardNo}}</td>
-      <td>{{card.worker.id}}</td>
       <td>{{card.worker.name}}</td>
+      <td>{{card.worker.idNo}}</td>
       <td>{{card.inBlackList?'是':'否'}}</td>
     </tr>
   </tbody>

@@ -1,5 +1,7 @@
 package com.yyy.server.worker.service;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityNotFoundException;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.yyy.server.card.repo.Card;
 import com.yyy.server.card.repo.CardRepo;
 import com.yyy.server.domain.repo.Domain;
+import com.yyy.server.domain.repo.DomainRepo;
 import com.yyy.server.worker.repo.Worker;
 import com.yyy.server.worker.repo.WorkerRepo;
 import com.yyy.server.workerIncident.repo.Incident;
@@ -37,6 +40,8 @@ public class WorkerController {
 	private IncidentRepo incRepo;
 	@Autowired
 	private CardRepo cardRepo;
+	@Autowired
+	private DomainRepo domainRepo;
 
 	@GetMapping
 	public Page<Worker> getWorkers(@PathVariable Long domainId, Pageable pageable) throws Exception {
@@ -47,6 +52,33 @@ public class WorkerController {
 	public Page<Worker> findWorkerByNameLike(@PathVariable Long domainId, @RequestParam() String nameLike,
 			Pageable pageable) throws Exception {
 		return repo.findByDomainAndNameLike(new Domain(domainId), nameLike, pageable);
+	}
+
+	/**
+	 * Recursively search the workers of this domain and its ancestor domains.
+	 * 
+	 * @param domainId
+	 * @param nameLike
+	 * @param pageable
+	 * @return
+	 * @throws Exception
+	 */
+	@GetMapping("/searchRecursive")
+	public Page<Worker> findRecursiveWorkersByNameLike(@PathVariable Long domainId, @RequestParam() String nameLike,
+			Pageable pageable) throws Exception {
+		List<BigInteger> idList = domainRepo.findAllParentIds(domainId);
+		List<Domain> domains = new ArrayList<Domain>(idList.size());
+		idList.forEach(id->{domains.add(new Domain(id.longValue()));});
+		/*Domain d = domainRepo.findOne(domainId);
+		if (d == null) {
+			throw new IllegalArgumentException("Domain not found:" + domainId);
+		}
+		List<Domain> domains = new ArrayList<Domain>();
+		while (d != null) {
+			domains.add(d);
+			d = d.getParent();
+		}*/
+		return repo.findByDomainInAndNameLike(domains, nameLike, pageable);
 	}
 
 	@GetMapping("/{id}")

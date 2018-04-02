@@ -22,12 +22,12 @@ export class WorkerInputComponent implements OnInit {
   domainId: number;
   _worker: Worker;
   @Output() selectedChange = new EventEmitter();
-  pageable = new Pageable(0, 10, 'id');
+  pageable = new Pageable(0, 10, 'name');
   search: any;
   searching = false;
   searchFailed = false;
   hideSearchingWhenUnsubscribed = new Observable(() => () => this.searching = false);
-  formatter = (value: Worker) => value.name;
+  formatter = (value: Worker) => value.name + '(' + value.idNo + ')';
   constructor(private workerSrv: WorkerService) {
     this.search = (text$: Observable<string>) =>
       text$
@@ -35,7 +35,7 @@ export class WorkerInputComponent implements OnInit {
         .distinctUntilChanged()
         .do(() => this.searching = true)
         .switchMap(term =>
-          this.workerSrv.findWorkers(this.domainId, term, this.pageable)
+          this.workerSrv.findWorkersFromAncestorDomains(this.domainId, term, this.pageable)
             .do(() => this.searchFailed = false)
             .catch(() => {
               this.searchFailed = true;

@@ -79,7 +79,6 @@ export class IncidentComponent implements OnInit {
     this.incident.category = 'BLACK';
     this.incident.severity = 5;
     this.incident.happenTime = new Date();
-    this.incident.subject = new Worker();
     const now = new Date();
     this.maxDate = {
       'year': now.getFullYear(),

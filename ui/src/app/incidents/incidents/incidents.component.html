@@ -11,7 +11,8 @@
       <th scope="col">类型</th>
       <th scope="col">等级</th>
       <th scope="col">地点</th>
-      <th scope="col">人员</th>
+      <th scope="col">员工姓名</th>
+      <th scope="col">证件号码</th>
       <th scope="col">事件概要</th>
     </tr>
   </thead>
@@ -25,6 +26,7 @@
       <td>{{incident.severity}}</td>
       <td>{{incident.location}}</td>
       <td>{{(incident.subject==null)?"":incident.subject.name}}</td>
+      <td>{{(incident.subject==null)?"":incident.subject.idNo}}</td>
       <td>{{incident.title}}</td>
     </tr>
   </tbody>

@@ -1,5 +1,6 @@
 package com.yyy.server.worker.repo;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -16,5 +17,6 @@ public interface WorkerRepo extends PagingAndSortingRepository<Worker, Long> {
     Page<Worker> findByDomain(Domain domain,Pageable pageable);
     Worker getByIdAndDomain(Long id,Domain domain);
 	Page<Worker> findByDomainAndNameLike(Domain domain,String nameLike, Pageable pageable);
+	Page<Worker> findByDomainInAndNameLike(Collection<Domain> domains,String nameLike, Pageable pageable);
 
 }
